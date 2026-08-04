@@ -77,7 +77,7 @@ export function Header(): React.JSX.Element {
             aria-label={`${APP_NAME} — الصفحة الرئيسية`}
           >
             <Logo className="size-9 transition-transform duration-300 ease-[var(--ease-spring)] group-hover:scale-105" />
-            <span className="hidden font-quran text-2xl leading-none font-bold text-ink sm:block">
+            <span className="hidden font-quran text-2xl leading-none text-ink sm:block">
               {APP_NAME}
             </span>
           </Link>

@@ -20,7 +20,7 @@ export function ChapterCard({ chapter }: { readonly chapter: Chapter }): React.J
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-quran text-xl leading-tight font-bold text-ink">
+        <span className="block truncate font-quran text-xl leading-tight text-ink">
           {chapter.name}
         </span>
         <span className="mt-0.5 block truncate text-xs text-ink-subtle">

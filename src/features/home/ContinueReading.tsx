@@ -39,9 +39,7 @@ export function ContinueReading(): React.JSX.Element {
             <Icon name="mushaf" size={14} />
             ابدأ القراءة
           </p>
-          <h3 className="mt-2.5 font-quran text-2xl font-bold text-ink">
-            {fatihah?.name ?? 'الفاتحة'}
-          </h3>
+          <h3 className="mt-2.5 font-quran text-2xl text-ink">{fatihah?.name ?? 'الفاتحة'}</h3>
           <p className="mt-1.5 text-sm text-ink-muted">
             افتح المصحف من أوله — سيُحفظ موضعك تلقائياً لتُكمل لاحقاً.
           </p>
@@ -64,7 +62,7 @@ export function ContinueReading(): React.JSX.Element {
           آخر قراءة · {formatRelativeTime(lastRead.timestamp)}
         </p>
 
-        <h3 className="mt-2.5 font-quran text-2xl font-bold text-ink">
+        <h3 className="mt-2.5 font-quran text-2xl text-ink">
           {chapter?.name ?? lastRead.surahName}
         </h3>
 

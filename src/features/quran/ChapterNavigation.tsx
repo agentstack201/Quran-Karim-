@@ -34,9 +34,7 @@ export function ChapterNavigation({
           />
           <span className="min-w-0 text-start">
             <span className="block text-[0.6875rem] text-ink-subtle">السورة السابقة</span>
-            <span className="block truncate font-quran text-lg font-bold text-ink">
-              {previous.name}
-            </span>
+            <span className="block truncate font-quran text-lg text-ink">{previous.name}</span>
           </span>
         </Link>
       ) : (
@@ -51,9 +49,7 @@ export function ChapterNavigation({
         >
           <span className="min-w-0 text-end">
             <span className="block text-[0.6875rem] text-ink-subtle">السورة التالية</span>
-            <span className="block truncate font-quran text-lg font-bold text-ink">
-              {next.name}
-            </span>
+            <span className="block truncate font-quran text-lg text-ink">{next.name}</span>
           </span>
           <Icon
             name="chevronStart"

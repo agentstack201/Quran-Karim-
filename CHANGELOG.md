@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Performance
+
+- **Fonts cut from 312 kB to 138 kB.** Declaring all nine vendored files as two
+  families made Next preload every one of them. Amiri now ships Arabic regular
+  only; Cairo's Latin cut loads on demand through the font fallback chain.
+- **The first ten verses render on the server**, so the reader never shows a
+  skeleton where text is about to appear.
+- **`content-visibility` applies only below verse 15**, keeping its height
+  correction out of the viewport where it counted as a layout shift.
+- The ayah-of-the-day card waits for an idle callback instead of parsing a
+  274 kB surah during first paint.
+- Measured result: performance 59–86 → 81–93, and **cumulative layout shift
+  0.19 → 0** on every reading page.
+
+### Fixed
+
+- The scroll-to-top button used `opacity-0` while hidden, so it still occupied
+  space for hit-testing directly over the last ayah's action row — a WCAG 2.2 ·
+  2.5.8 target-size failure. It is now `invisible`.
+
+### Added
+
+- `scripts/audit-accessibility.mjs` — the accessibility audit as a committed,
+  repeatable script covering 13 routes, 4 appearances and 3 dialogs, failing on
+  a single violation.
+- GitHub Actions CI: verify, dataset integrity and accessibility as separate
+  jobs, so a failure names the gate that broke.
+- Repository governance: PR template, issue templates (including a dedicated
+  highest-priority template for Quranic text corrections), SECURITY.md and
+  .env.example.
+- README now reports measured Lighthouse results instead of stated targets.
+
 ## [1.0.0] — 2026-08-04
 
 First production release.

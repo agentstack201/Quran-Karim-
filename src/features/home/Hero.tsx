@@ -28,7 +28,7 @@ export function Hero(): React.JSX.Element {
 
         <h1
           id="hero-heading"
-          className="mt-6 animate-[var(--animate-rise)] font-quran text-5xl leading-[1.15] font-bold text-ink sm:text-6xl"
+          className="mt-6 animate-[var(--animate-rise)] font-quran text-5xl leading-[1.15] text-ink sm:text-6xl"
         >
           {APP_NAME}
         </h1>

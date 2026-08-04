@@ -24,9 +24,7 @@ export function Footer(): React.JSX.Element {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5">
               <Logo className="size-9" />
-              <span className="font-quran text-2xl leading-none font-bold text-ink">
-                {APP_NAME}
-              </span>
+              <span className="font-quran text-2xl leading-none text-ink">{APP_NAME}</span>
             </div>
             <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ink-muted">{APP_TAGLINE}</p>
             <p className="mt-4 text-xs leading-relaxed text-ink-subtle">

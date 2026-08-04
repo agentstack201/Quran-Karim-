@@ -27,9 +27,15 @@ export function ScrollToTop(): React.JSX.Element {
         'fixed end-5 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-40',
         'inline-flex size-11 items-center justify-center border-border bg-surface-raised text-ink-muted',
         'rounded-full border shadow-[var(--shadow-lg)]',
-        'transition-[opacity,transform] duration-300 ease-[var(--ease-out-soft)]',
+        'transition-[opacity,transform,visibility] duration-300 ease-[var(--ease-out-soft)]',
         'hover:border-primary/40 hover:text-primary active:scale-90',
-        visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
+        // `invisible`, not merely `opacity-0`: a transparent element still
+        // occupies space for hit-testing, and this one sits exactly over the
+        // action row of the last ayah — which axe correctly reported as a
+        // WCAG 2.2 · 2.5.8 target-size failure on long surahs.
+        visible
+          ? 'visible translate-y-0 opacity-100'
+          : 'pointer-events-none invisible translate-y-3 opacity-0',
       )}
     >
       <Icon name="arrowUp" size={19} />

@@ -9,8 +9,8 @@
  *   • fonts are available offline from the very first service-worker precache
  *   • builds never fail because fonts.googleapis.com is unreachable
  *
- * Only the Arabic and Latin subsets are kept — the app never renders Cyrillic,
- * Greek or Vietnamese text, so shipping those subsets would be dead weight.
+ * Only what each family actually renders is kept — see KEEP below. Every extra
+ * file is another file Next preloads on the critical path.
  *
  * Usage:  npm run fonts:fetch
  */
@@ -25,8 +25,20 @@ const FONT_DIR = join(ROOT, 'public', 'fonts');
 const USER_AGENT =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-/** Subsets we actually render. Everything else is discarded. */
-const KEPT_SUBSETS = new Set(['arabic', 'latin', 'latin-ext']);
+/**
+ * What each family is actually asked to render.
+ *
+ * Amiri sets Quranic text, which is Arabic throughout, in a single regular
+ * weight — traditional Naskh is not set in bold. Cairo sets the interface, so
+ * it needs Arabic and Latin.
+ *
+ * Narrowing this is a performance decision, not tidiness: every extra file here
+ * is another file Next preloads on the critical path.
+ */
+const KEEP = {
+  Amiri: { subsets: new Set(['arabic']), weights: new Set(['400']) },
+  Cairo: { subsets: new Set(['arabic', 'latin']), weights: null },
+};
 
 /**
  * @typedef {object} FontRequest
@@ -37,7 +49,7 @@ const KEPT_SUBSETS = new Set(['arabic', 'latin', 'latin-ext']);
 
 /** @type {FontRequest[]} */
 const FONTS = [
-  { family: 'Amiri', slug: 'amiri', query: 'Amiri:wght@400;700' },
+  { family: 'Amiri', slug: 'amiri', query: 'Amiri:wght@400' },
   { family: 'Cairo', slug: 'cairo', query: 'Cairo:wght@400..700' },
 ];
 
@@ -86,8 +98,13 @@ async function main() {
       throw new Error(`Failed to fetch CSS for ${font.family}: ${response.status}`);
     }
 
+    const rules = KEEP[font.family];
     const faces = parseFontFaces(await response.text());
-    const kept = faces.filter((face) => KEPT_SUBSETS.has(face.subset));
+    const kept = faces.filter(
+      (face) =>
+        rules.subsets.has(face.subset) &&
+        (rules.weights === null || rules.weights.has(face.weight.replace(/\s+/g, '-'))),
+    );
 
     if (kept.length === 0) {
       throw new Error(`No usable subsets found for ${font.family}`);

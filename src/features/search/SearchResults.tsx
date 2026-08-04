@@ -108,9 +108,7 @@ export function SearchResults(): React.JSX.Element {
             className="flex items-center justify-between gap-3 rounded-lg border border-primary/35 bg-primary-soft p-4 transition-colors duration-200 hover:border-primary"
           >
             <span>
-              <span className="block font-quran text-xl font-bold text-ink">
-                {reference.chapter.name}
-              </span>
+              <span className="block font-quran text-xl text-ink">{reference.chapter.name}</span>
               <span className="mt-0.5 block text-sm text-ink-muted">
                 الآية {toArabicNumerals(reference.ayah)} من{' '}
                 {toArabicNumerals(reference.chapter.versesCount)}

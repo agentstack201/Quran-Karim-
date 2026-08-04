@@ -112,9 +112,7 @@ export function HeroSearch(): React.JSX.Element {
                 onClick={() => router.push(item.href)}
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-start transition-colors duration-150 hover:bg-surface-sunken"
               >
-                <span className="truncate font-quran text-lg font-bold text-ink">
-                  {item.primary}
-                </span>
+                <span className="truncate font-quran text-lg text-ink">{item.primary}</span>
                 <span className="shrink-0 text-xs text-ink-subtle">{item.secondary}</span>
               </button>
             </li>

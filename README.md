@@ -11,6 +11,7 @@ _An elegant, offline-first Quran Progressive Web App_
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white)](#-progressive-web-app)
 [![License](https://img.shields.io/badge/License-MIT-0F6B4F)](LICENSE)
+[![CI](https://github.com/agentstack201/quran-karim-/actions/workflows/ci.yml/badge.svg)](https://github.com/agentstack201/quran-karim-/actions/workflows/ci.yml)
 
 </div>
 
@@ -106,6 +107,7 @@ No environment variables are required — the app runs fully out of the box.
 | `npm test`               | Run the test suite once                  |
 | `npm run test:watch`     | Test suite in watch mode                 |
 | `npm run test:coverage`  | Test suite with a coverage summary       |
+| `npm run audit:a11y`     | axe-core audit against a running build   |
 | `npm run format`         | Prettier write                           |
 | `npm run verify`         | format → lint → typecheck → test → build |
 | `npm run data:generate`  | Regenerate the Quran datasets            |
@@ -192,22 +194,51 @@ Installable on **Android, iOS, Windows and macOS**.
 
 ---
 
-## ✦ الجودة · Quality Targets
+## ✦ الجودة · Measured Quality
 
-| Metric                    | Target            |
-| ------------------------- | ----------------- |
-| Lighthouse Performance    | ≥ 95              |
-| Lighthouse Accessibility  | 100               |
-| Lighthouse Best Practices | 100               |
-| Lighthouse SEO            | 100               |
-| PWA                       | Fully installable |
-| TypeScript errors         | 0                 |
-| ESLint errors             | 0                 |
+These are Lighthouse results, not targets. Measured against the production
+build under Lighthouse's mobile profile — slow 4G and a 4× CPU slowdown — which
+is deliberately harsher than most real devices and connections.
+
+| Route                 | Performance | Accessibility | Best Practices | SEO | LCP   | CLS   | TBT    |
+| --------------------- | ----------- | ------------- | -------------- | --- | ----- | ----- | ------ |
+| `/`                   | 91          | 100           | 100            | 100 | 3.5 s | 0.012 | 60 ms  |
+| `/surah/1`            | 92          | 100           | 100            | 100 | 3.4 s | 0     | 90 ms  |
+| `/surah/2` (286 ayat) | 84          | 100           | 100            | 100 | 3.7 s | 0     | 260 ms |
+| `/surah`              | 93          | 100           | 100            | 100 | 3.2 s | 0     | 50 ms  |
+| `/juz/30` (564 ayat)  | 81          | 100           | 100            | 100 | 3.4 s | 0     | 440 ms |
+
+**Accessibility, Best Practices and SEO are 100 on every route**, and cumulative
+layout shift is zero on every reading page. Performance dips on the two longest
+ranges in the Mus'haf — Al-Baqarah and juz 30 — where several hundred verse
+components render in one pass; that is the honest cost of showing a complete
+juz on one page rather than paginating it.
+
+<details>
+<summary>How these numbers were reached</summary>
+
+The first measurement scored 59–86 with a 0.19 layout shift. Four changes fixed it:
+
+1. **Fonts cut from 312 kB to 138 kB.** Declaring all nine vendored files as two
+   families made Next preload every one of them. Amiri now ships Arabic regular
+   only — Naskh is not set in bold — and Cairo's Latin cut loads on demand
+   through the ordinary font fallback chain.
+2. **The first ten verses render on the server**, inside the same static HTML as
+   the page shell, so the reader never shows a skeleton where text is about to
+   appear.
+3. **`content-visibility` applies only below the fold.** It reserves an estimated
+   height and corrects it on first render; inside the viewport that correction
+   _is_ the layout shift. Below verse 15 the same correction is invisible and
+   free — which is where the 0.19 → 0 came from.
+4. **The ayah-of-the-day card waits for an idle callback**, instead of parsing a
+   274 kB surah while the page is still painting.
+
+</details>
 
 **Accessibility:** WCAG 2.2 AA, verified with `axe-core` rather than assumed —
-11 routes × both themes × all three light surfaces × every dialog, currently at
-**zero violations**. Full keyboard navigation, visible focus rings, ARIA
-labelling, focus trapping in dialogs, live regions for async state, and respected
+11 routes × both themes × all three light surfaces × every dialog, at **zero
+violations**. Full keyboard navigation, visible focus rings, ARIA labelling,
+focus trapping in dialogs, live regions for async state, and respected
 `prefers-reduced-motion` and `prefers-contrast`.
 
 **Tests:** 73 tests covering Arabic normalisation, dataset integrity (all 6236

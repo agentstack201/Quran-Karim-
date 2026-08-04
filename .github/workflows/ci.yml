@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same branch supersedes the run in flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # `npm ci` installs exactly what the lockfile pins and fails if
+      # package.json and the lockfile have drifted apart.
+      - name: Install dependencies
+        run: npm ci
+
+      # Each step runs separately rather than through `npm run verify`, so a
+      # failure names the gate that broke instead of just "verify failed".
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  data-integrity:
+    name: Dataset integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The Quranic dataset is committed, so nothing in the normal build would
+      # notice if it were corrupted, truncated or hand-edited. This job exists
+      # to make that impossible to merge.
+      - name: Verify the committed Quran dataset
+        run: npx vitest run tests/dataset.test.ts
+
+  accessibility:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx --yes playwright@1 install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Start the production server
+        run: |
+          npm start &
+          npx --yes wait-on http://127.0.0.1:3000 --timeout 60000
+
+      # Fails the run on a single WCAG 2.2 AA violation. The suite currently
+      # passes at zero, and that is the only acceptable number.
+      - name: Audit with axe-core
+        run: node scripts/audit-accessibility.mjs

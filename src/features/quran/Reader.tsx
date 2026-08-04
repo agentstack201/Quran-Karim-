@@ -19,10 +19,31 @@ export type ReaderProps = {
   /** Show the Basmalah above the first verse. */
   readonly showBasmalah?: boolean;
   readonly surahName: string;
+  /**
+   * The opening verses, inlined by the server into the static HTML.
+   *
+   * They render on the very first paint, so the reader never shows a skeleton
+   * where text is about to appear — which is what removed the 0.19 layout shift
+   * these pages used to score. The client fetch still runs and still fills the
+   * offline cache; it just replaces this opening with the complete range.
+   */
+  readonly initialVerses?: readonly Verse[];
+  /** Total verses in the range, used to reserve scroll height while loading. */
+  readonly totalVerses?: number;
 };
 
 /** Stable empty array so downstream memos do not see a new reference each render. */
 const NO_VERSES: readonly Verse[] = [];
+
+/**
+ * Index from which verses opt into off-screen render skipping.
+ *
+ * Set beyond the tallest possible first viewport, so the height correction
+ * `content-visibility` performs on first render never happens where the user
+ * can see it — which is the difference between 0 and 0.19 cumulative layout
+ * shift on these pages.
+ */
+const DEFERRED_RENDER_FROM = 15;
 
 /** A completed load, tagged with what it loaded. */
 type Snapshot = {
@@ -51,6 +72,8 @@ export function Reader({
   id,
   showBasmalah = false,
   surahName,
+  initialVerses = NO_VERSES,
+  totalVerses = 0,
 }: ReaderProps): React.JSX.Element {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
@@ -92,12 +115,24 @@ export function Reader({
   }, [requestKey, mode, id]);
 
   const resolved = snapshot?.requestKey === requestKey ? snapshot : null;
-  const verses = resolved?.verses ?? NO_VERSES;
+  // Until the fetch lands, render the server-inlined opening. Because those are
+  // the same verses the fetch will return first, the swap is invisible.
+  const verses = resolved?.verses ?? initialVerses;
 
   let status: AsyncStatus;
-  if (!resolved) status = 'loading';
-  else if (resolved.error) status = 'error';
+  if (resolved?.error) status = 'error';
+  else if (!resolved && initialVerses.length === 0) status = 'loading';
   else status = 'success';
+
+  /**
+   * Height reserved for the verses still in flight.
+   *
+   * Without it the page is only as tall as the inlined opening, so the
+   * scrollbar jumps the moment the rest arrives. 210px is the measured median
+   * verse height at the default type size.
+   */
+  const pendingHeight =
+    resolved || totalVerses <= verses.length ? undefined : (totalVerses - verses.length) * 210;
 
   /**
    * The playback queue. In surah mode it is the surah's own ayah numbers; for
@@ -219,7 +254,7 @@ export function Reader({
 
         {status === 'success' && (
           <div role="list" aria-label={`آيات ${surahName}`}>
-            {verses.map((verse) => (
+            {verses.map((verse, index) => (
               <div role="listitem" key={verse.id}>
                 <VerseCard
                   verse={verse}
@@ -228,9 +263,16 @@ export function Reader({
                   onOpenTafsir={onOpenTafsir}
                   playing={track?.surah === verse.surah && track.ayah === verse.ayah && playing}
                   focused={focusedAyah === verse.ayah}
+                  deferred={index >= DEFERRED_RENDER_FROM}
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {pendingHeight !== undefined && (
+          <div style={{ blockSize: pendingHeight }} aria-hidden="true">
+            <SkeletonReader count={3} />
           </div>
         )}
       </div>

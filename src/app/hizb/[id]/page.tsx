@@ -7,6 +7,7 @@ import { Badge, Icon } from '@/components/ui';
 import { PartNavigation } from '@/features/quran/PartNavigation';
 import { ReaderBoundary } from '@/features/quran/ReaderBoundary';
 import { HIZB_LIST, getChapter, getHizb } from '@/services/quran';
+import { getInitialHizbVerses } from '@/services/quran.server';
 import { toArabicNumerals } from '@/utils';
 
 type PageProps = { readonly params: Promise<{ id: string }> };
@@ -49,6 +50,8 @@ export default async function HizbPage({ params }: PageProps): Promise<React.JSX
 
   if (!hizb) notFound();
 
+  const initialVerses = await getInitialHizbVerses(hizb.id);
+
   const start = getChapter(hizb.start.surah);
   const end = getChapter(hizb.end.surah);
 
@@ -83,7 +86,13 @@ export default async function HizbPage({ params }: PageProps): Promise<React.JSX
         </div>
       </PageHeader>
 
-      <ReaderBoundary mode="hizb" id={hizb.id} surahName={hizb.name} />
+      <ReaderBoundary
+        mode="hizb"
+        id={hizb.id}
+        surahName={hizb.name}
+        initialVerses={initialVerses}
+        totalVerses={hizb.versesCount}
+      />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <PartNavigation kind="hizb" id={hizb.id} max={TOTAL_HIZB} />

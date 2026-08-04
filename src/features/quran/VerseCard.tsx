@@ -19,6 +19,16 @@ export type VerseCardProps = {
   readonly playing: boolean;
   /** Highlighted because it was the navigation target. */
   readonly focused: boolean;
+  /**
+   * Allow the browser to skip rendering this verse while it is off-screen.
+   *
+   * Only set for verses far enough down that they cannot be in the first
+   * viewport. `content-visibility` reserves an estimated height and corrects it
+   * on first render, and when that correction lands inside the viewport it
+   * counts as a layout shift — which measured 0.19 across the reading pages.
+   * Below the fold the same correction is invisible and free.
+   */
+  readonly deferred: boolean;
 };
 
 /**
@@ -40,6 +50,7 @@ function VerseCardComponent({
   onOpenTafsir,
   playing,
   focused,
+  deferred,
 }: VerseCardProps): React.JSX.Element {
   const { settings } = useSettings();
   const { isBookmarked, toggleBookmark, recordLastRead } = useBookmarks();
@@ -116,7 +127,8 @@ function VerseCardComponent({
       id={`ayah-${verse.ayah}`}
       aria-labelledby={`ayah-${verse.ayah}-label`}
       className={cn(
-        'verse-block group scroll-mt-24 border-b border-border px-1 py-6 transition-colors duration-500 last:border-b-0 sm:px-3',
+        'group scroll-mt-24 border-b border-border px-1 py-6 transition-colors duration-500 last:border-b-0 sm:px-3',
+        deferred && 'verse-block',
         playing && 'bg-[var(--verse-playing)]',
         !playing && focused && 'bg-[var(--verse-highlight)]',
       )}
@@ -201,6 +213,7 @@ function VerseCardComponent({
 export const VerseCard = memo(VerseCardComponent, (previous, next) => {
   return (
     previous.verse.id === next.verse.id &&
+    previous.deferred === next.deferred &&
     previous.playing === next.playing &&
     previous.focused === next.focused &&
     previous.surahName === next.surahName &&

@@ -7,6 +7,7 @@ import { Badge, Icon } from '@/components/ui';
 import { ChapterNavigation } from '@/features/quran/ChapterNavigation';
 import { ReaderBoundary } from '@/features/quran/ReaderBoundary';
 import { CHAPTERS, getChapter } from '@/services/quran';
+import { getInitialChapterVerses } from '@/services/quran.server';
 import { toArabicNumerals } from '@/utils';
 
 type PageProps = { readonly params: Promise<{ id: string }> };
@@ -55,6 +56,8 @@ export default async function SurahPage({ params }: PageProps): Promise<React.JS
   const chapter = getChapter(chapterId);
 
   if (!chapter) notFound();
+
+  const initialVerses = await getInitialChapterVerses(chapter.id);
 
   const breadcrumbs = {
     '@context': 'https://schema.org',
@@ -116,6 +119,8 @@ export default async function SurahPage({ params }: PageProps): Promise<React.JS
         id={chapter.id}
         surahName={chapter.name}
         showBasmalah={chapter.hasBasmalah}
+        initialVerses={initialVerses}
+        totalVerses={chapter.versesCount}
       />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">

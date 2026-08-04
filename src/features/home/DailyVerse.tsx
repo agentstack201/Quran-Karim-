@@ -48,8 +48,29 @@ export function DailyVerse(): React.JSX.Element {
       else setFailed(true);
     };
 
-    void run();
-    return () => controller.abort();
+    /*
+     * Deferred off the critical path.
+     *
+     * Picking the verse means loading the surah that contains it, and that
+     * surah can be Al-Baqarah — 274 kB to parse for a single ayah, competing
+     * with first paint for main-thread time on a phone. The card is not what a
+     * visitor came for, so it waits until the browser is idle.
+     *
+     * `requestIdleCallback` is unavailable on Safari, hence the timeout.
+     */
+    const schedule =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(() => void run(), { timeout: 2500 })
+        : window.setTimeout(() => void run(), 400);
+
+    return () => {
+      controller.abort();
+      if (typeof window.cancelIdleCallback === 'function' && typeof schedule === 'number') {
+        window.cancelIdleCallback(schedule);
+      } else {
+        window.clearTimeout(schedule as number);
+      }
+    };
   }, []);
 
   if (failed) {

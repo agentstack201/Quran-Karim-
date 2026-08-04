@@ -7,6 +7,7 @@ import { Badge, Icon } from '@/components/ui';
 import { PartNavigation } from '@/features/quran/PartNavigation';
 import { ReaderBoundary } from '@/features/quran/ReaderBoundary';
 import { JUZ_LIST, getChapter, getJuz } from '@/services/quran';
+import { getInitialJuzVerses } from '@/services/quran.server';
 import { toArabicNumerals } from '@/utils';
 
 type PageProps = { readonly params: Promise<{ id: string }> };
@@ -49,6 +50,8 @@ export default async function JuzPage({ params }: PageProps): Promise<React.JSX.
 
   if (!juz) notFound();
 
+  const initialVerses = await getInitialJuzVerses(juz.id);
+
   const start = getChapter(juz.start.surah);
   const end = getChapter(juz.end.surah);
 
@@ -83,7 +86,13 @@ export default async function JuzPage({ params }: PageProps): Promise<React.JSX.
         </div>
       </PageHeader>
 
-      <ReaderBoundary mode="juz" id={juz.id} surahName={juz.name} />
+      <ReaderBoundary
+        mode="juz"
+        id={juz.id}
+        surahName={juz.name}
+        initialVerses={initialVerses}
+        totalVerses={juz.versesCount}
+      />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <PartNavigation kind="juz" id={juz.id} max={TOTAL_JUZ} />

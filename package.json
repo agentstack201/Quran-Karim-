@@ -28,6 +28,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "data:generate": "node scripts/generate-quran-data.mjs",
+    "fonts:fetch": "node scripts/fetch-fonts.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build"
   },

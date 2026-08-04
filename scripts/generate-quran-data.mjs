@@ -106,8 +106,8 @@ async function main() {
   const hafs = createHafs();
 
   console.log('▸ Loading source data…');
-  const [arabicChapters, englishIndex, englishChapters, transliterationChapters] = await Promise.all(
-    [
+  const [arabicChapters, englishIndex, englishChapters, transliterationChapters] =
+    await Promise.all([
       loadSource('chapters/index.json'),
       loadSource('chapters/en/index.json'),
       Promise.all(
@@ -116,8 +116,7 @@ async function main() {
       Promise.all(
         Array.from({ length: TOTAL_SURAHS }, (_, i) => loadSource(`chapters/${i + 1}.json`)),
       ),
-    ],
-  );
+    ]);
 
   const englishById = new Map(englishIndex.map((chapter) => [chapter.id, chapter]));
   const arabicById = new Map(arabicChapters.map((chapter) => [chapter.id, chapter]));

@@ -8,7 +8,8 @@ import type { NextConfig } from 'next';
  * theme bootstrap script is allow-listed through a hash-free `'strict-dynamic'`
  * free policy that only trusts same-origin scripts plus the inline bootstrap.
  */
-const AUDIO_ORIGINS = 'https://everyayah.com https://*.everyayah.com https://download.quranicaudio.com';
+const AUDIO_ORIGINS =
+  'https://everyayah.com https://*.everyayah.com https://download.quranicaudio.com';
 const API_ORIGINS = 'https://api.quran.com';
 
 const contentSecurityPolicy = [

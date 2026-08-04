@@ -1,0 +1,206 @@
+/**
+ * Tilawa — design tokens.
+ * ---------------------------------------------------------------------------
+ * A single source of truth for colour, elevation, motion and rhythm.
+ *
+ * The palette is warm and restrained: aged paper, deep forest greens and a
+ * muted gold reserved for ornament. Every foreground/background pair below
+ * clears WCAG 2.2 AA (4.5:1 for body text, 3:1 for large text and UI shapes).
+ *
+ * Two orthogonal axes drive theming, both persisted to LocalStorage:
+ *   • `data-theme`   — 'light' | 'dark'      (resolved from the user's choice)
+ *   • `data-surface` — 'paper' | 'beige' | 'white'  (light-mode reading surface)
+ *
+ * Components must never reference a raw hex value; they consume the semantic
+ * tokens exposed through `@theme inline` in `globals.css`.
+ */
+
+:root {
+  /* ---- brand constants (theme-independent) ---------------------------- */
+  --brand-emerald: #0f6b4f;
+  --brand-forest: #0b3d2e;
+  --brand-gold: #b8892b;
+  --brand-sand: #f5efe4;
+
+  /* ---- surfaces ------------------------------------------------------- */
+  --background: #faf6ee;
+  --background-subtle: #f3ece0;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f6f1e7;
+  --overlay: rgb(11 33 25 / 0.42);
+
+  /* ---- text ----------------------------------------------------------- */
+  --ink: #12211c;
+  --ink-muted: #56675f;
+  --ink-subtle: #77877f;
+  --ink-inverse: #f8faf9;
+
+  /* ---- lines ---------------------------------------------------------- */
+  --border: #e6ddcd;
+  --border-strong: #d3c7b1;
+
+  /* ---- accents -------------------------------------------------------- */
+  --primary: #0f6b4f;
+  --primary-hover: #0c5740;
+  --primary-active: #094634;
+  --primary-soft: #e3f0ea;
+  --primary-soft-hover: #d3e7de;
+  --on-primary: #ffffff;
+
+  --accent: #8f6a1c;
+  --accent-strong: #b8892b;
+  --accent-soft: #f7eeda;
+  --on-accent: #ffffff;
+
+  /* ---- status --------------------------------------------------------- */
+  --success: #14663f;
+  --success-soft: #e2f1e9;
+  --warning: #8a5a08;
+  --warning-soft: #fbf0da;
+  --danger: #a32020;
+  --danger-soft: #fbe6e6;
+  --info: #1a5a86;
+  --info-soft: #e2eef7;
+
+  /* ---- focus ---------------------------------------------------------- */
+  --focus-ring: #0f6b4f;
+  --focus-ring-offset: var(--background);
+
+  /* ---- elevation ------------------------------------------------------ */
+  --shadow-color: 32 45 38;
+  --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.06);
+  --shadow-sm: 0 1px 3px rgb(var(--shadow-color) / 0.07), 0 1px 2px rgb(var(--shadow-color) / 0.04);
+  --shadow-md:
+    0 4px 12px -2px rgb(var(--shadow-color) / 0.09), 0 2px 6px -2px rgb(var(--shadow-color) / 0.05);
+  --shadow-lg:
+    0 12px 28px -6px rgb(var(--shadow-color) / 0.13),
+    0 4px 10px -4px rgb(var(--shadow-color) / 0.06);
+  --shadow-xl: 0 24px 56px -12px rgb(var(--shadow-color) / 0.2);
+
+  /* ---- decorative ----------------------------------------------------- */
+  --ornament: rgb(184 137 43 / 0.28);
+  --hairline: rgb(18 33 28 / 0.07);
+  --paper-texture: 0;
+
+  /* ---- reader --------------------------------------------------------- */
+  --quran-scale: 1;
+  --quran-leading: 2.15;
+  --verse-highlight: rgb(15 107 79 / 0.08);
+  --verse-playing: rgb(184 137 43 / 0.16);
+}
+
+/* --------------------------------------------------------------------------
+ * Light reading surfaces
+ * ------------------------------------------------------------------------ */
+
+:root[data-surface='beige'] {
+  --background: #f2e9d8;
+  --background-subtle: #ebe0ca;
+  --surface: #fbf7ef;
+  --surface-raised: #fffdf8;
+  --surface-sunken: #ece2ce;
+  --border: #ded1b6;
+  --border-strong: #c9b894;
+  --paper-texture: 1;
+}
+
+:root[data-surface='white'] {
+  --background: #ffffff;
+  --background-subtle: #f7f8f7;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f4f6f5;
+  --border: #e4e8e6;
+  --border-strong: #cfd6d2;
+  --surface-sunken: #f4f6f5;
+  --paper-texture: 0;
+}
+
+:root[data-surface='paper'] {
+  --paper-texture: 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Dark theme — overrides every semantic token. Declared last so it wins over
+ * any light-surface selector of equal specificity.
+ * ------------------------------------------------------------------------ */
+
+:root[data-theme='dark'] {
+  --background: #0b1210;
+  --background-subtle: #0f1a16;
+  --surface: #121c18;
+  --surface-raised: #18241f;
+  --surface-sunken: #0d1512;
+  --overlay: rgb(2 8 6 / 0.68);
+
+  --ink: #e8efea;
+  --ink-muted: #a3b3ab;
+  --ink-subtle: #82938b;
+  --ink-inverse: #0b1210;
+
+  --border: #24332c;
+  --border-strong: #33463c;
+
+  --primary: #34c79a;
+  --primary-hover: #4dd6ac;
+  --primary-active: #6ee0bd;
+  --primary-soft: #12241d;
+  --primary-soft-hover: #173029;
+  --on-primary: #04140e;
+
+  --accent: #d9af54;
+  --accent-strong: #e6c274;
+  --accent-soft: #241d10;
+  --on-accent: #1a1305;
+
+  --success: #4ecf9a;
+  --success-soft: #10241a;
+  --warning: #e0b054;
+  --warning-soft: #241c0e;
+  --danger: #f0847e;
+  --danger-soft: #2a1414;
+  --info: #6fb6e8;
+  --info-soft: #101f2b;
+
+  --focus-ring: #4dd6ac;
+  --focus-ring-offset: var(--background);
+
+  --shadow-color: 0 0 0;
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.32);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.24);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.48), 0 2px 6px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 28px -6px rgb(0 0 0 / 0.56), 0 4px 10px -4px rgb(0 0 0 / 0.34);
+  --shadow-xl: 0 24px 56px -12px rgb(0 0 0 / 0.7);
+
+  --ornament: rgb(217 175 84 / 0.3);
+  --hairline: rgb(232 239 234 / 0.08);
+  --paper-texture: 0;
+
+  --verse-highlight: rgb(52 199 154 / 0.1);
+  --verse-playing: rgb(217 175 84 / 0.14);
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+ * High-contrast preference — strengthen lines and mute decorative alpha.
+ * ------------------------------------------------------------------------ */
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-muted: #37453e;
+    --ink-subtle: #445249;
+    --border: #b9ad96;
+    --border-strong: #8d8371;
+    --hairline: rgb(18 33 28 / 0.16);
+  }
+
+  :root[data-theme='dark'] {
+    --ink-muted: #cbd8d1;
+    --ink-subtle: #b3c2ba;
+    --border: #465a50;
+    --border-strong: #5e7466;
+    --hairline: rgb(232 239 234 / 0.18);
+  }
+}

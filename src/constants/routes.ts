@@ -1,0 +1,38 @@
+/**
+ * Every route in the application, defined once.
+ *
+ * Components link through these helpers rather than string literals, so a route
+ * rename is a single-file change and typos become type errors.
+ */
+export const ROUTES = {
+  home: '/',
+  surahIndex: '/surah',
+  surah: (id: number): string => `/surah/${id}`,
+  surahAyah: (surah: number, ayah: number): string => `/surah/${surah}#ayah-${ayah}`,
+  juzIndex: '/juz',
+  juz: (id: number): string => `/juz/${id}`,
+  hizbIndex: '/hizb',
+  hizb: (id: number): string => `/hizb/${id}`,
+  search: '/search',
+  searchQuery: (query: string): string => `/search?q=${encodeURIComponent(query)}`,
+  bookmarks: '/bookmarks',
+  about: '/about',
+  offline: '/offline',
+} as const;
+
+/** API endpoints served by our own route handlers. */
+export const API_ROUTES = {
+  search: '/api/search',
+  tafsir: (verseKey: string, tafsirId: number): string =>
+    `/api/tafsir/${encodeURIComponent(verseKey)}?edition=${tafsirId}`,
+  surah: (id: number): string => `/data/surah/${id}.json`,
+} as const;
+
+/** Primary navigation, rendered in the header and the mobile drawer. */
+export const NAV_ITEMS = [
+  { href: ROUTES.home, label: 'الرئيسية', icon: 'home' },
+  { href: ROUTES.surahIndex, label: 'السور', icon: 'book' },
+  { href: ROUTES.juzIndex, label: 'الأجزاء', icon: 'layers' },
+  { href: ROUTES.hizbIndex, label: 'الأحزاب', icon: 'grid' },
+  { href: ROUTES.bookmarks, label: 'المحفوظات', icon: 'bookmark' },
+] as const;

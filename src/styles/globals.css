@@ -1,0 +1,400 @@
+@import 'tailwindcss';
+@import './theme.css';
+
+/* ---------------------------------------------------------------------------
+ * Dark mode is driven by `data-theme` on <html>, written by the theme bootstrap
+ * before first paint, so `dark:` utilities must follow that attribute rather
+ * than the `prefers-color-scheme` media query.
+ * ------------------------------------------------------------------------- */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------
+ * Semantic token → Tailwind utility mapping.
+ * `inline` keeps the CSS variables live, so a theme switch re-paints instantly
+ * without Tailwind having to regenerate anything.
+ * ------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-overlay: var(--overlay);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-inverse: var(--ink-inverse);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-hairline: var(--hairline);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-hover: var(--primary-soft-hover);
+  --color-on-primary: var(--on-primary);
+
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --color-ornament: var(--ornament);
+  --color-verse-highlight: var(--verse-highlight);
+  --color-verse-playing: var(--verse-playing);
+
+  --font-quran: var(--font-amiri), 'Amiri', 'Traditional Arabic', serif;
+  --font-sans: var(--font-cairo), 'Cairo', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.375rem;
+  --radius-2xl: 1.875rem;
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-fade-in: fade-in 0.28s var(--ease-out-soft) both;
+  --animate-rise: rise 0.42s var(--ease-out-soft) both;
+  --animate-scale-in: scale-in 0.2s var(--ease-out-soft) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-slide-up: slide-up 0.32s var(--ease-out-soft) both;
+  --animate-spin-slow: spin 1.1s linear infinite;
+
+  --breakpoint-3xl: 112rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Keyframes
+ * ------------------------------------------------------------------------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Base layer
+ * ------------------------------------------------------------------------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    scroll-padding-block-start: 5.5rem;
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'kern', 'liga', 'calt';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+    overflow-wrap: break-word;
+    transition:
+      background-color 0.32s var(--ease-out-soft),
+      color 0.32s var(--ease-out-soft);
+  }
+
+  /* Faint woven-paper grain on the paper and beige surfaces. Rendered as a
+     layered gradient rather than an image so it costs no extra request. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: calc(var(--paper-texture) * 0.5);
+    background-image:
+      radial-gradient(circle at 15% 12%, rgb(184 137 43 / 0.05), transparent 42%),
+      radial-gradient(circle at 85% 8%, rgb(15 107 79 / 0.045), transparent 38%),
+      repeating-linear-gradient(112deg, rgb(120 96 54 / 0.022) 0 1px, transparent 1px 3px);
+    transition: opacity 0.4s var(--ease-out-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Remove the default outline only where a focus-visible ring is provided. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--primary-soft);
+    color: var(--ink);
+  }
+
+  ::placeholder {
+    color: var(--ink-subtle);
+    opacity: 1;
+  }
+
+  /* Slim, theme-aware scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ink-subtle);
+    background-clip: content-box;
+  }
+
+  /* Native controls should follow the active theme. */
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  [type='search']::-webkit-search-cancel-button,
+  [type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Component-level utilities that are genuinely reused across features.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  /* Quranic text. The scale multiplier is user-controlled and persisted. */
+  .quran-text {
+    font-family: var(--font-quran);
+    font-size: calc(1.75rem * var(--quran-scale));
+    line-height: var(--quran-leading);
+    font-feature-settings: 'kern', 'liga', 'calt', 'ccmp', 'mark', 'mkmk';
+    font-variant-ligatures: common-ligatures contextual;
+    letter-spacing: 0;
+    word-spacing: 0.06em;
+    text-align: justify;
+    text-align-last: center;
+    hanging-punctuation: none;
+  }
+
+  @media (min-width: 48rem) {
+    .quran-text {
+      font-size: calc(2.125rem * var(--quran-scale));
+    }
+  }
+
+  /* The circled ayah number that follows each verse. */
+  .ayah-medallion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: calc(2.05em * var(--quran-scale, 1));
+    block-size: calc(2.05em * var(--quran-scale, 1));
+    font-size: calc(0.44em);
+    font-family: var(--font-quran);
+    color: var(--accent);
+    background-image: radial-gradient(circle, var(--accent-soft) 58%, transparent 60%);
+    border: 1.5px solid var(--ornament);
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-inline: 0.3em;
+    user-select: none;
+    flex: none;
+  }
+
+  /* Horizontal rule with a centred ornament, used between sections. */
+  .ornamental-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    color: var(--ornament);
+  }
+
+  .ornamental-rule::before,
+  .ornamental-rule::after {
+    content: '';
+    flex: 1;
+    block-size: 1px;
+    background-image: linear-gradient(
+      to var(--rule-direction, left),
+      transparent,
+      var(--border-strong)
+    );
+  }
+
+  /* Shimmering placeholder used by every skeleton. */
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      var(--surface-sunken) 25%,
+      var(--background-subtle) 37%,
+      var(--surface-sunken) 63%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Content visually hidden but available to assistive technology. */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion preferences — honour `prefers-reduced-motion` globally instead of
+ * guarding every animation individually.
+ * ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Print — deliver a clean, ink-friendly Mus'haf page.
+ * ------------------------------------------------------------------------- */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  body::before,
+  [data-print='hidden'] {
+    display: none !important;
+  }
+
+  .quran-text {
+    font-size: 20pt;
+    line-height: 2;
+  }
+}

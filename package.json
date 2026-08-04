@@ -25,12 +25,15 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "data:generate": "node scripts/generate-quran-data.mjs",
     "fonts:fetch": "node scripts/fetch-fonts.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build"
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "next": "16.3.0",
@@ -44,12 +47,15 @@
     "@types/node": "22.18.9",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
+    "@vitest/coverage-v8": "4.1.10",
     "eslint": "9.39.1",
     "eslint-config-next": "16.3.0",
+    "jsdom": "30.0.1",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.7.2",
     "quran-meta": "6.0.17",
     "tailwindcss": "4.3.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
   }
 }

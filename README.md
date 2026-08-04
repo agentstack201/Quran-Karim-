@@ -33,14 +33,14 @@ completely offline, with live services layered on top for tafsir and recitation 
 
 ### القراءة · Reading
 
-|                          |                                                                    |
-| ------------------------ | ------------------------------------------------------------------ |
-| 📖 **المصحف كاملاً**     | ١١٤ سورة · ٦٢٣٦ آية بالرسم العثماني                                |
-| 🗂️ **تصفح متعدد**        | حسب السورة أو الجزء (٣٠) أو الحزب (٦٠)                             |
-| 🔍 **بحث فوري**          | بحث في نص القرآن والترجمة أثناء الكتابة، مع تطبيع للحروف العربية   |
-| 📝 **التفسير**           | التفسير الميسر + الترجمة الإنجليزية + معلومات الآية في نافذة أنيقة |
-| 🔖 **العلامات المرجعية** | حفظ الآيات المفضلة ومتابعة آخر قراءة تلقائياً                      |
-| 📋 **نسخ ومشاركة**       | نسخ الآية أو مشاركتها عبر واجهة المشاركة الأصلية للنظام            |
+|                          |                                                                     |
+| ------------------------ | ------------------------------------------------------------------- |
+| 📖 **المصحف كاملاً**     | ١١٤ سورة · ٦٢٣٦ آية بالرسم العثماني                                 |
+| 🗂️ **تصفح متعدد**        | حسب السورة أو الجزء (٣٠) أو الحزب (٦٠)                              |
+| 🔍 **بحث فوري**          | بحث في نص القرآن والترجمة أثناء الكتابة، يتجاهل التشكيل ورسم الهمزة |
+| 📝 **التفسير**           | التفسير الميسر + الترجمة الإنجليزية + معلومات الآية في نافذة أنيقة  |
+| 🔖 **العلامات المرجعية** | حفظ الآيات المفضلة ومتابعة آخر قراءة تلقائياً                       |
+| 📋 **نسخ ومشاركة**       | نسخ الآية أو مشاركتها عبر واجهة المشاركة الأصلية للنظام             |
 
 ### التخصيص · Personalisation
 
@@ -103,8 +103,11 @@ No environment variables are required — the app runs fully out of the box.
 | `npm start`              | Serve the production build               |
 | `npm run lint`           | ESLint (flat config)                     |
 | `npm run typecheck`      | `tsc --noEmit`                           |
+| `npm test`               | Run the test suite once                  |
+| `npm run test:watch`     | Test suite in watch mode                 |
+| `npm run test:coverage`  | Test suite with a coverage summary       |
 | `npm run format`         | Prettier write                           |
-| `npm run verify`         | format → lint → typecheck → build        |
+| `npm run verify`         | format → lint → typecheck → test → build |
 | `npm run data:generate`  | Regenerate the Quran datasets            |
 | `npm run icons:generate` | Regenerate PWA icons from the brand mark |
 
@@ -201,9 +204,16 @@ Installable on **Android, iOS, Windows and macOS**.
 | TypeScript errors         | 0                 |
 | ESLint errors             | 0                 |
 
-**Accessibility:** WCAG 2.2 AA — full keyboard navigation, visible focus rings,
-ARIA labelling, focus trapping in dialogs, live regions for async state, respected
+**Accessibility:** WCAG 2.2 AA, verified with `axe-core` rather than assumed —
+11 routes × both themes × all three light surfaces × every dialog, currently at
+**zero violations**. Full keyboard navigation, visible focus rings, ARIA
+labelling, focus trapping in dialogs, live regions for async state, and respected
 `prefers-reduced-motion` and `prefers-contrast`.
+
+**Tests:** 73 tests covering Arabic normalisation, dataset integrity (all 6236
+verses and every juz/hizb boundary), search behaviour and formatting. The dataset
+suite is the important one: the generated files are committed, so these tests are
+what catch a corrupted or hand-edited Mus'haf before a reader ever sees it.
 
 **SEO:** per-route metadata, Open Graph, Twitter cards, canonical URLs,
 `robots.txt`, `sitemap.xml`, and `Book` / `WebSite` / `BreadcrumbList` JSON-LD.

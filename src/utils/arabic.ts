@@ -23,6 +23,36 @@ const DIACRITICS = /[ؐ-ًؚ-ٰٟۖ-ۭ࣓-ࣿ]/g;
 
 const TATWEEL = /ـ/g;
 
+/**
+ * Waw + superscript alef, optionally followed by a silent alef.
+ *
+ * The Uthmani script writes a whole family of words with a waw carrying a
+ * superscript alef where modern orthography simply has a plain alef:
+ * ٱلصَّلَوٰة / الصلاة, زَكَوٰة / زكاة, ٱلۡحَيَوٰة / الحياة, ٱلرِّبَوٰا۟ / الربا.
+ *
+ * Stripping the superscript alef as an ordinary diacritic leaves the waw
+ * behind — "الصلوه" — so a reader searching for "الصلاة" finds nothing. Folding
+ * the pair to a plain alef before the diacritics are removed fixes the whole
+ * family at once.
+ *
+ * A bare superscript alef with no waw stays deleted, because there modern
+ * orthography also omits it: ٱلرَّحۡمَٰن is written الرحمن, not الرحمان.
+ */
+const WAW_SUPERSCRIPT_ALEF = /و[\u064B-\u0652]*\u0670\u0627?/g;
+
+/**
+ * Alef maqsura + superscript alef, immediately before a ta marbuta.
+ *
+ * The same orthographic gap as above, in a second shape: ٱلتَّوۡرَىٰة is written
+ * التوراة, and مِشۡكَىٰة is written مشكاة.
+ *
+ * The trailing ta marbuta is what makes this safe. An alef maqsura carrying a
+ * superscript alef at the *end* of a word — عَلَىٰ, إِلَىٰ, مُوسَىٰ — keeps its
+ * modern spelling with ى, so folding those to a plain alef would break far more
+ * words than it fixed.
+ */
+const ALEF_MAQSURA_SUPERSCRIPT_ALEF = /ى[\u064B-\u0652]*\u0670(?=ة)/g;
+
 /** Converts Western digits in a string to Arabic-Indic digits. */
 export function toArabicNumerals(value: number | string): string {
   return String(value)
@@ -40,6 +70,8 @@ export function toArabicNumerals(value: number | string): string {
  */
 export function normaliseArabic(text: string): string {
   return text
+    .replace(WAW_SUPERSCRIPT_ALEF, 'ا')
+    .replace(ALEF_MAQSURA_SUPERSCRIPT_ALEF, 'ا')
     .replace(DIACRITICS, '')
     .replace(TATWEEL, '')
     .replace(/[آأإٱٲٳ]/g, 'ا') // alef forms → ا
@@ -87,5 +119,8 @@ export function excerpt(text: string, maxLength = 90): string {
   if (text.length <= maxLength) return text;
   const cut = text.slice(0, maxLength);
   const lastSpace = cut.lastIndexOf(' ');
-  return `${(lastSpace > maxLength * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+  // Prefer a word boundary unless honouring it would throw away more than half
+  // the excerpt. Arabic words run long, so cutting mid-word is the worse defect.
+  const useBoundary = lastSpace >= maxLength * 0.5;
+  return `${(useBoundary ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
 }

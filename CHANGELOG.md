@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-08-04
+
+First production release.
+
 ### Added
 
 - Project scaffold: Next.js 16 App Router, React 19, TypeScript 5.9 in strict
@@ -50,6 +54,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   skip layout and paint.
 - 214 pages prerendered at build time.
 
+### Fixed
+
+- **Search missed an entire family of words.** The Uthmani script writes
+  الصلاة, الزكاة, الحياة, التوراة and مشكاة with a waw or alef maqsura carrying a
+  superscript alef. Stripping that mark as an ordinary diacritic left "الصلوه",
+  so a reader searching for "الصلاة" got no results at all. Both spellings now
+  fold onto the same form, while عَلَىٰ and مُوسَىٰ keep their modern spelling.
+- `excerpt()` no longer cuts mid-word when the last space sits exactly at the
+  60% threshold.
+
+### Testing
+
+- 73 tests across Arabic normalisation, dataset integrity, search and
+  formatting, run by Vitest as part of `npm run verify`.
+- Dataset tests assert all 6236 verses, contiguous juz and hizb coverage, the
+  hizb-inside-juz relationship the reader depends on, and the contents of every
+  generated payload — the committed data's safety net.
+
 ### Accessibility
 
 - Verified with axe-core across 11 routes, both themes, all three light
@@ -63,3 +85,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected heading order by making card heading levels caller-controlled.
 
 [Unreleased]: https://github.com/agentstack201/quran-karim-/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/agentstack201/quran-karim-/releases/tag/v1.0.0

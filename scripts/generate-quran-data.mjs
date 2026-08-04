@@ -82,16 +82,25 @@ async function loadSource(relativePath) {
  * @param {string} text
  */
 function normaliseArabic(text) {
-  return text
-    .replace(/[ؐ-ًؚ-ٰٟۖ-ۭ࣓-ࣿ]/g, '')
-    .replace(/ـ/g, '')
-    .replace(/[آأإٱٲٳ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    text
+      // Waw + superscript alef → plain alef, so ٱلصَّلَوٰة matches الصلاة.
+      // Must run before the diacritics are stripped. See the twin of this
+      // function in src/utils/arabic.ts for the full rationale.
+      .replace(/\u0648[\u064B-\u0652]*\u0670\u0627?/g, 'ا')
+      // Alef maqsura + superscript alef before a ta marbuta → alef, so
+      // ٱلتَّوۡرَىٰة matches التوراة. The trailing ة is what keeps عَلَىٰ safe.
+      .replace(/\u0649[\u064B-\u0652]*\u0670(?=\u0629)/g, 'ا')
+      .replace(/[ؐ-ًؚ-ٰٟۖ-ۭ࣓-ࣿ]/g, '')
+      .replace(/ـ/g, '')
+      .replace(/[آأإٱٲٳ]/g, 'ا')
+      .replace(/ى/g, 'ي')
+      .replace(/ة/g, 'ه')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 /** Pretty, stable JSON output (newline-terminated for clean diffs). */

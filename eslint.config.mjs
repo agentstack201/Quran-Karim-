@@ -48,12 +48,19 @@ const config = [
             {
               group: ['@/data/search-index.json'],
               message:
-                'The search index is 1.8 MB and must never reach the client bundle. Import it only from services/search.server.ts.',
+                'The search index is ~3 MB and must never reach the client bundle. Import it only from services/search.server.ts.',
             },
           ],
         },
       ],
     },
+  },
+
+  {
+    // The one module allowed to load the search index — it is `server-only`
+    // and never reaches a browser bundle.
+    files: ['src/services/search.server.ts'],
+    rules: { 'no-restricted-imports': 'off' },
   },
 
   {

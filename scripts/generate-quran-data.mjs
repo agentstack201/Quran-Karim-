@@ -6,7 +6,7 @@
  *   src/data/chapters.json        114 surah records (metadata only)
  *   src/data/juz.json              30 juz boundaries
  *   src/data/hizb.json             60 hizb boundaries
- *   src/data/search-index.json     6236 lightweight verse records for search
+ *   src/data/search-index.json     6236 verse records powering server-side search
  *   public/data/surah/{1..114}.json  full verse payloads, fetched on demand
  *
  * Sources
@@ -165,7 +165,11 @@ async function main() {
         i: ayahId,
         s: surahNumber,
         a: ayahNumber,
+        // Normalised for matching…
         n: normaliseArabic(arabicText),
+        // …and the Uthmani original, so results render with full vocalisation
+        // rather than the stripped form used for comparison.
+        o: arabicText,
         t: verse.translation,
       });
 

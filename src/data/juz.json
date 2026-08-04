@@ -1,0 +1,632 @@
+[
+  {
+    "id": 1,
+    "name": "الجزء ١",
+    "firstVerseId": 1,
+    "lastVerseId": 148,
+    "versesCount": 148,
+    "start": {
+      "surah": 1,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 141
+    },
+    "startPage": 1,
+    "endPage": 21,
+    "hizbs": [
+      1,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "name": "الجزء ٢",
+    "firstVerseId": 149,
+    "lastVerseId": 259,
+    "versesCount": 111,
+    "start": {
+      "surah": 2,
+      "ayah": 142
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 252
+    },
+    "startPage": 22,
+    "endPage": 41,
+    "hizbs": [
+      3,
+      4
+    ]
+  },
+  {
+    "id": 3,
+    "name": "الجزء ٣",
+    "firstVerseId": 260,
+    "lastVerseId": 385,
+    "versesCount": 126,
+    "start": {
+      "surah": 2,
+      "ayah": 253
+    },
+    "end": {
+      "surah": 3,
+      "ayah": 92
+    },
+    "startPage": 42,
+    "endPage": 62,
+    "hizbs": [
+      5,
+      6
+    ]
+  },
+  {
+    "id": 4,
+    "name": "الجزء ٤",
+    "firstVerseId": 386,
+    "lastVerseId": 516,
+    "versesCount": 131,
+    "start": {
+      "surah": 3,
+      "ayah": 93
+    },
+    "end": {
+      "surah": 4,
+      "ayah": 23
+    },
+    "startPage": 62,
+    "endPage": 81,
+    "hizbs": [
+      7,
+      8
+    ]
+  },
+  {
+    "id": 5,
+    "name": "الجزء ٥",
+    "firstVerseId": 517,
+    "lastVerseId": 640,
+    "versesCount": 124,
+    "start": {
+      "surah": 4,
+      "ayah": 24
+    },
+    "end": {
+      "surah": 4,
+      "ayah": 147
+    },
+    "startPage": 82,
+    "endPage": 101,
+    "hizbs": [
+      9,
+      10
+    ]
+  },
+  {
+    "id": 6,
+    "name": "الجزء ٦",
+    "firstVerseId": 641,
+    "lastVerseId": 750,
+    "versesCount": 110,
+    "start": {
+      "surah": 4,
+      "ayah": 148
+    },
+    "end": {
+      "surah": 5,
+      "ayah": 81
+    },
+    "startPage": 102,
+    "endPage": 121,
+    "hizbs": [
+      11,
+      12
+    ]
+  },
+  {
+    "id": 7,
+    "name": "الجزء ٧",
+    "firstVerseId": 751,
+    "lastVerseId": 899,
+    "versesCount": 149,
+    "start": {
+      "surah": 5,
+      "ayah": 82
+    },
+    "end": {
+      "surah": 6,
+      "ayah": 110
+    },
+    "startPage": 121,
+    "endPage": 141,
+    "hizbs": [
+      13,
+      14
+    ]
+  },
+  {
+    "id": 8,
+    "name": "الجزء ٨",
+    "firstVerseId": 900,
+    "lastVerseId": 1041,
+    "versesCount": 142,
+    "start": {
+      "surah": 6,
+      "ayah": 111
+    },
+    "end": {
+      "surah": 7,
+      "ayah": 87
+    },
+    "startPage": 142,
+    "endPage": 161,
+    "hizbs": [
+      15,
+      16
+    ]
+  },
+  {
+    "id": 9,
+    "name": "الجزء ٩",
+    "firstVerseId": 1042,
+    "lastVerseId": 1200,
+    "versesCount": 159,
+    "start": {
+      "surah": 7,
+      "ayah": 88
+    },
+    "end": {
+      "surah": 8,
+      "ayah": 40
+    },
+    "startPage": 162,
+    "endPage": 181,
+    "hizbs": [
+      17,
+      18
+    ]
+  },
+  {
+    "id": 10,
+    "name": "الجزء ١٠",
+    "firstVerseId": 1201,
+    "lastVerseId": 1327,
+    "versesCount": 127,
+    "start": {
+      "surah": 8,
+      "ayah": 41
+    },
+    "end": {
+      "surah": 9,
+      "ayah": 92
+    },
+    "startPage": 182,
+    "endPage": 201,
+    "hizbs": [
+      19,
+      20
+    ]
+  },
+  {
+    "id": 11,
+    "name": "الجزء ١١",
+    "firstVerseId": 1328,
+    "lastVerseId": 1478,
+    "versesCount": 151,
+    "start": {
+      "surah": 9,
+      "ayah": 93
+    },
+    "end": {
+      "surah": 11,
+      "ayah": 5
+    },
+    "startPage": 201,
+    "endPage": 221,
+    "hizbs": [
+      21,
+      22
+    ]
+  },
+  {
+    "id": 12,
+    "name": "الجزء ١٢",
+    "firstVerseId": 1479,
+    "lastVerseId": 1648,
+    "versesCount": 170,
+    "start": {
+      "surah": 11,
+      "ayah": 6
+    },
+    "end": {
+      "surah": 12,
+      "ayah": 52
+    },
+    "startPage": 222,
+    "endPage": 241,
+    "hizbs": [
+      23,
+      24
+    ]
+  },
+  {
+    "id": 13,
+    "name": "الجزء ١٣",
+    "firstVerseId": 1649,
+    "lastVerseId": 1802,
+    "versesCount": 154,
+    "start": {
+      "surah": 12,
+      "ayah": 53
+    },
+    "end": {
+      "surah": 14,
+      "ayah": 52
+    },
+    "startPage": 242,
+    "endPage": 261,
+    "hizbs": [
+      25,
+      26
+    ]
+  },
+  {
+    "id": 14,
+    "name": "الجزء ١٤",
+    "firstVerseId": 1803,
+    "lastVerseId": 2029,
+    "versesCount": 227,
+    "start": {
+      "surah": 15,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 16,
+      "ayah": 128
+    },
+    "startPage": 262,
+    "endPage": 281,
+    "hizbs": [
+      27,
+      28
+    ]
+  },
+  {
+    "id": 15,
+    "name": "الجزء ١٥",
+    "firstVerseId": 2030,
+    "lastVerseId": 2214,
+    "versesCount": 185,
+    "start": {
+      "surah": 17,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 18,
+      "ayah": 74
+    },
+    "startPage": 282,
+    "endPage": 301,
+    "hizbs": [
+      29,
+      30
+    ]
+  },
+  {
+    "id": 16,
+    "name": "الجزء ١٦",
+    "firstVerseId": 2215,
+    "lastVerseId": 2483,
+    "versesCount": 269,
+    "start": {
+      "surah": 18,
+      "ayah": 75
+    },
+    "end": {
+      "surah": 20,
+      "ayah": 135
+    },
+    "startPage": 302,
+    "endPage": 321,
+    "hizbs": [
+      31,
+      32
+    ]
+  },
+  {
+    "id": 17,
+    "name": "الجزء ١٧",
+    "firstVerseId": 2484,
+    "lastVerseId": 2673,
+    "versesCount": 190,
+    "start": {
+      "surah": 21,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 22,
+      "ayah": 78
+    },
+    "startPage": 322,
+    "endPage": 341,
+    "hizbs": [
+      33,
+      34
+    ]
+  },
+  {
+    "id": 18,
+    "name": "الجزء ١٨",
+    "firstVerseId": 2674,
+    "lastVerseId": 2875,
+    "versesCount": 202,
+    "start": {
+      "surah": 23,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 25,
+      "ayah": 20
+    },
+    "startPage": 342,
+    "endPage": 361,
+    "hizbs": [
+      35,
+      36
+    ]
+  },
+  {
+    "id": 19,
+    "name": "الجزء ١٩",
+    "firstVerseId": 2876,
+    "lastVerseId": 3214,
+    "versesCount": 339,
+    "start": {
+      "surah": 25,
+      "ayah": 21
+    },
+    "end": {
+      "surah": 27,
+      "ayah": 55
+    },
+    "startPage": 362,
+    "endPage": 381,
+    "hizbs": [
+      37,
+      38
+    ]
+  },
+  {
+    "id": 20,
+    "name": "الجزء ٢٠",
+    "firstVerseId": 3215,
+    "lastVerseId": 3385,
+    "versesCount": 171,
+    "start": {
+      "surah": 27,
+      "ayah": 56
+    },
+    "end": {
+      "surah": 29,
+      "ayah": 45
+    },
+    "startPage": 382,
+    "endPage": 401,
+    "hizbs": [
+      39,
+      40
+    ]
+  },
+  {
+    "id": 21,
+    "name": "الجزء ٢١",
+    "firstVerseId": 3386,
+    "lastVerseId": 3563,
+    "versesCount": 178,
+    "start": {
+      "surah": 29,
+      "ayah": 46
+    },
+    "end": {
+      "surah": 33,
+      "ayah": 30
+    },
+    "startPage": 402,
+    "endPage": 421,
+    "hizbs": [
+      41,
+      42
+    ]
+  },
+  {
+    "id": 22,
+    "name": "الجزء ٢٢",
+    "firstVerseId": 3564,
+    "lastVerseId": 3732,
+    "versesCount": 169,
+    "start": {
+      "surah": 33,
+      "ayah": 31
+    },
+    "end": {
+      "surah": 36,
+      "ayah": 27
+    },
+    "startPage": 422,
+    "endPage": 441,
+    "hizbs": [
+      43,
+      44
+    ]
+  },
+  {
+    "id": 23,
+    "name": "الجزء ٢٣",
+    "firstVerseId": 3733,
+    "lastVerseId": 4089,
+    "versesCount": 357,
+    "start": {
+      "surah": 36,
+      "ayah": 28
+    },
+    "end": {
+      "surah": 39,
+      "ayah": 31
+    },
+    "startPage": 442,
+    "endPage": 461,
+    "hizbs": [
+      45,
+      46
+    ]
+  },
+  {
+    "id": 24,
+    "name": "الجزء ٢٤",
+    "firstVerseId": 4090,
+    "lastVerseId": 4264,
+    "versesCount": 175,
+    "start": {
+      "surah": 39,
+      "ayah": 32
+    },
+    "end": {
+      "surah": 41,
+      "ayah": 46
+    },
+    "startPage": 462,
+    "endPage": 481,
+    "hizbs": [
+      47,
+      48
+    ]
+  },
+  {
+    "id": 25,
+    "name": "الجزء ٢٥",
+    "firstVerseId": 4265,
+    "lastVerseId": 4510,
+    "versesCount": 246,
+    "start": {
+      "surah": 41,
+      "ayah": 47
+    },
+    "end": {
+      "surah": 45,
+      "ayah": 37
+    },
+    "startPage": 482,
+    "endPage": 502,
+    "hizbs": [
+      49,
+      50
+    ]
+  },
+  {
+    "id": 26,
+    "name": "الجزء ٢٦",
+    "firstVerseId": 4511,
+    "lastVerseId": 4705,
+    "versesCount": 195,
+    "start": {
+      "surah": 46,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 51,
+      "ayah": 30
+    },
+    "startPage": 502,
+    "endPage": 521,
+    "hizbs": [
+      51,
+      52
+    ]
+  },
+  {
+    "id": 27,
+    "name": "الجزء ٢٧",
+    "firstVerseId": 4706,
+    "lastVerseId": 5104,
+    "versesCount": 399,
+    "start": {
+      "surah": 51,
+      "ayah": 31
+    },
+    "end": {
+      "surah": 57,
+      "ayah": 29
+    },
+    "startPage": 522,
+    "endPage": 541,
+    "hizbs": [
+      53,
+      54
+    ]
+  },
+  {
+    "id": 28,
+    "name": "الجزء ٢٨",
+    "firstVerseId": 5105,
+    "lastVerseId": 5241,
+    "versesCount": 137,
+    "start": {
+      "surah": 58,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 66,
+      "ayah": 12
+    },
+    "startPage": 542,
+    "endPage": 561,
+    "hizbs": [
+      55,
+      56
+    ]
+  },
+  {
+    "id": 29,
+    "name": "الجزء ٢٩",
+    "firstVerseId": 5242,
+    "lastVerseId": 5672,
+    "versesCount": 431,
+    "start": {
+      "surah": 67,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 77,
+      "ayah": 50
+    },
+    "startPage": 562,
+    "endPage": 581,
+    "hizbs": [
+      57,
+      58
+    ]
+  },
+  {
+    "id": 30,
+    "name": "الجزء ٣٠",
+    "firstVerseId": 5673,
+    "lastVerseId": 6236,
+    "versesCount": 564,
+    "start": {
+      "surah": 78,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 114,
+      "ayah": 6
+    },
+    "startPage": 582,
+    "endPage": 604,
+    "hizbs": [
+      59,
+      60
+    ]
+  }
+]

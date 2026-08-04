@@ -1,0 +1,54 @@
+{
+  "name": "tilawa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "تلاوة — مصحف رقمي أنيق للقراءة والاستماع والتدبر. An elegant, offline-first Quran Progressive Web App.",
+  "keywords": [
+    "quran",
+    "قرآن",
+    "mushaf",
+    "tafsir",
+    "tilawa",
+    "islam",
+    "pwa",
+    "nextjs",
+    "typescript"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "data:generate": "node scripts/generate-quran-data.mjs",
+    "icons:generate": "node scripts/generate-icons.mjs",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.3",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.18.9",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.3.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "quran-meta": "6.0.17",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}

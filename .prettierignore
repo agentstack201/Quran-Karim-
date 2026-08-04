@@ -1,0 +1,10 @@
+.next
+node_modules
+out
+coverage
+pnpm-lock.yaml
+package-lock.json
+public/data
+public/sw.js
+src/data
+next-env.d.ts

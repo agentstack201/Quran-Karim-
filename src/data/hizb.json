@@ -1,0 +1,1082 @@
+[
+  {
+    "id": 1,
+    "name": "الحزب ١",
+    "juz": 1,
+    "firstVerseId": 1,
+    "lastVerseId": 81,
+    "versesCount": 81,
+    "start": {
+      "surah": 1,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 74
+    },
+    "startPage": 1,
+    "endPage": 11
+  },
+  {
+    "id": 2,
+    "name": "الحزب ٢",
+    "juz": 1,
+    "firstVerseId": 82,
+    "lastVerseId": 148,
+    "versesCount": 67,
+    "start": {
+      "surah": 2,
+      "ayah": 75
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 141
+    },
+    "startPage": 11,
+    "endPage": 21
+  },
+  {
+    "id": 3,
+    "name": "الحزب ٣",
+    "juz": 2,
+    "firstVerseId": 149,
+    "lastVerseId": 209,
+    "versesCount": 61,
+    "start": {
+      "surah": 2,
+      "ayah": 142
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 202
+    },
+    "startPage": 22,
+    "endPage": 31
+  },
+  {
+    "id": 4,
+    "name": "الحزب ٤",
+    "juz": 2,
+    "firstVerseId": 210,
+    "lastVerseId": 259,
+    "versesCount": 50,
+    "start": {
+      "surah": 2,
+      "ayah": 203
+    },
+    "end": {
+      "surah": 2,
+      "ayah": 252
+    },
+    "startPage": 32,
+    "endPage": 41
+  },
+  {
+    "id": 5,
+    "name": "الحزب ٥",
+    "juz": 3,
+    "firstVerseId": 260,
+    "lastVerseId": 307,
+    "versesCount": 48,
+    "start": {
+      "surah": 2,
+      "ayah": 253
+    },
+    "end": {
+      "surah": 3,
+      "ayah": 14
+    },
+    "startPage": 42,
+    "endPage": 51
+  },
+  {
+    "id": 6,
+    "name": "الحزب ٦",
+    "juz": 3,
+    "firstVerseId": 308,
+    "lastVerseId": 385,
+    "versesCount": 78,
+    "start": {
+      "surah": 3,
+      "ayah": 15
+    },
+    "end": {
+      "surah": 3,
+      "ayah": 92
+    },
+    "startPage": 51,
+    "endPage": 62
+  },
+  {
+    "id": 7,
+    "name": "الحزب ٧",
+    "juz": 4,
+    "firstVerseId": 386,
+    "lastVerseId": 463,
+    "versesCount": 78,
+    "start": {
+      "surah": 3,
+      "ayah": 93
+    },
+    "end": {
+      "surah": 3,
+      "ayah": 170
+    },
+    "startPage": 62,
+    "endPage": 72
+  },
+  {
+    "id": 8,
+    "name": "الحزب ٨",
+    "juz": 4,
+    "firstVerseId": 464,
+    "lastVerseId": 516,
+    "versesCount": 53,
+    "start": {
+      "surah": 3,
+      "ayah": 171
+    },
+    "end": {
+      "surah": 4,
+      "ayah": 23
+    },
+    "startPage": 72,
+    "endPage": 81
+  },
+  {
+    "id": 9,
+    "name": "الحزب ٩",
+    "juz": 5,
+    "firstVerseId": 517,
+    "lastVerseId": 580,
+    "versesCount": 64,
+    "start": {
+      "surah": 4,
+      "ayah": 24
+    },
+    "end": {
+      "surah": 4,
+      "ayah": 87
+    },
+    "startPage": 82,
+    "endPage": 92
+  },
+  {
+    "id": 10,
+    "name": "الحزب ١٠",
+    "juz": 5,
+    "firstVerseId": 581,
+    "lastVerseId": 640,
+    "versesCount": 60,
+    "start": {
+      "surah": 4,
+      "ayah": 88
+    },
+    "end": {
+      "surah": 4,
+      "ayah": 147
+    },
+    "startPage": 92,
+    "endPage": 101
+  },
+  {
+    "id": 11,
+    "name": "الحزب ١١",
+    "juz": 6,
+    "firstVerseId": 641,
+    "lastVerseId": 695,
+    "versesCount": 55,
+    "start": {
+      "surah": 4,
+      "ayah": 148
+    },
+    "end": {
+      "surah": 5,
+      "ayah": 26
+    },
+    "startPage": 102,
+    "endPage": 112
+  },
+  {
+    "id": 12,
+    "name": "الحزب ١٢",
+    "juz": 6,
+    "firstVerseId": 696,
+    "lastVerseId": 750,
+    "versesCount": 55,
+    "start": {
+      "surah": 5,
+      "ayah": 27
+    },
+    "end": {
+      "surah": 5,
+      "ayah": 81
+    },
+    "startPage": 112,
+    "endPage": 121
+  },
+  {
+    "id": 13,
+    "name": "الحزب ١٣",
+    "juz": 7,
+    "firstVerseId": 751,
+    "lastVerseId": 824,
+    "versesCount": 74,
+    "start": {
+      "surah": 5,
+      "ayah": 82
+    },
+    "end": {
+      "surah": 6,
+      "ayah": 35
+    },
+    "startPage": 121,
+    "endPage": 131
+  },
+  {
+    "id": 14,
+    "name": "الحزب ١٤",
+    "juz": 7,
+    "firstVerseId": 825,
+    "lastVerseId": 899,
+    "versesCount": 75,
+    "start": {
+      "surah": 6,
+      "ayah": 36
+    },
+    "end": {
+      "surah": 6,
+      "ayah": 110
+    },
+    "startPage": 132,
+    "endPage": 141
+  },
+  {
+    "id": 15,
+    "name": "الحزب ١٥",
+    "juz": 8,
+    "firstVerseId": 900,
+    "lastVerseId": 954,
+    "versesCount": 55,
+    "start": {
+      "surah": 6,
+      "ayah": 111
+    },
+    "end": {
+      "surah": 6,
+      "ayah": 165
+    },
+    "startPage": 142,
+    "endPage": 150
+  },
+  {
+    "id": 16,
+    "name": "الحزب ١٦",
+    "juz": 8,
+    "firstVerseId": 955,
+    "lastVerseId": 1041,
+    "versesCount": 87,
+    "start": {
+      "surah": 7,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 7,
+      "ayah": 87
+    },
+    "startPage": 151,
+    "endPage": 161
+  },
+  {
+    "id": 17,
+    "name": "الحزب ١٧",
+    "juz": 9,
+    "firstVerseId": 1042,
+    "lastVerseId": 1124,
+    "versesCount": 83,
+    "start": {
+      "surah": 7,
+      "ayah": 88
+    },
+    "end": {
+      "surah": 7,
+      "ayah": 170
+    },
+    "startPage": 162,
+    "endPage": 172
+  },
+  {
+    "id": 18,
+    "name": "الحزب ١٨",
+    "juz": 9,
+    "firstVerseId": 1125,
+    "lastVerseId": 1200,
+    "versesCount": 76,
+    "start": {
+      "surah": 7,
+      "ayah": 171
+    },
+    "end": {
+      "surah": 8,
+      "ayah": 40
+    },
+    "startPage": 173,
+    "endPage": 181
+  },
+  {
+    "id": 19,
+    "name": "الحزب ١٩",
+    "juz": 10,
+    "firstVerseId": 1201,
+    "lastVerseId": 1268,
+    "versesCount": 68,
+    "start": {
+      "surah": 8,
+      "ayah": 41
+    },
+    "end": {
+      "surah": 9,
+      "ayah": 33
+    },
+    "startPage": 182,
+    "endPage": 192
+  },
+  {
+    "id": 20,
+    "name": "الحزب ٢٠",
+    "juz": 10,
+    "firstVerseId": 1269,
+    "lastVerseId": 1327,
+    "versesCount": 59,
+    "start": {
+      "surah": 9,
+      "ayah": 34
+    },
+    "end": {
+      "surah": 9,
+      "ayah": 92
+    },
+    "startPage": 192,
+    "endPage": 201
+  },
+  {
+    "id": 21,
+    "name": "الحزب ٢١",
+    "juz": 11,
+    "firstVerseId": 1328,
+    "lastVerseId": 1389,
+    "versesCount": 62,
+    "start": {
+      "surah": 9,
+      "ayah": 93
+    },
+    "end": {
+      "surah": 10,
+      "ayah": 25
+    },
+    "startPage": 201,
+    "endPage": 211
+  },
+  {
+    "id": 22,
+    "name": "الحزب ٢٢",
+    "juz": 11,
+    "firstVerseId": 1390,
+    "lastVerseId": 1478,
+    "versesCount": 89,
+    "start": {
+      "surah": 10,
+      "ayah": 26
+    },
+    "end": {
+      "surah": 11,
+      "ayah": 5
+    },
+    "startPage": 212,
+    "endPage": 221
+  },
+  {
+    "id": 23,
+    "name": "الحزب ٢٣",
+    "juz": 12,
+    "firstVerseId": 1479,
+    "lastVerseId": 1556,
+    "versesCount": 78,
+    "start": {
+      "surah": 11,
+      "ayah": 6
+    },
+    "end": {
+      "surah": 11,
+      "ayah": 83
+    },
+    "startPage": 222,
+    "endPage": 231
+  },
+  {
+    "id": 24,
+    "name": "الحزب ٢٤",
+    "juz": 12,
+    "firstVerseId": 1557,
+    "lastVerseId": 1648,
+    "versesCount": 92,
+    "start": {
+      "surah": 11,
+      "ayah": 84
+    },
+    "end": {
+      "surah": 12,
+      "ayah": 52
+    },
+    "startPage": 231,
+    "endPage": 241
+  },
+  {
+    "id": 25,
+    "name": "الحزب ٢٥",
+    "juz": 13,
+    "firstVerseId": 1649,
+    "lastVerseId": 1725,
+    "versesCount": 77,
+    "start": {
+      "surah": 12,
+      "ayah": 53
+    },
+    "end": {
+      "surah": 13,
+      "ayah": 18
+    },
+    "startPage": 242,
+    "endPage": 251
+  },
+  {
+    "id": 26,
+    "name": "الحزب ٢٦",
+    "juz": 13,
+    "firstVerseId": 1726,
+    "lastVerseId": 1802,
+    "versesCount": 77,
+    "start": {
+      "surah": 13,
+      "ayah": 19
+    },
+    "end": {
+      "surah": 14,
+      "ayah": 52
+    },
+    "startPage": 252,
+    "endPage": 261
+  },
+  {
+    "id": 27,
+    "name": "الحزب ٢٧",
+    "juz": 14,
+    "firstVerseId": 1803,
+    "lastVerseId": 1951,
+    "versesCount": 149,
+    "start": {
+      "surah": 15,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 16,
+      "ayah": 50
+    },
+    "startPage": 262,
+    "endPage": 272
+  },
+  {
+    "id": 28,
+    "name": "الحزب ٢٨",
+    "juz": 14,
+    "firstVerseId": 1952,
+    "lastVerseId": 2029,
+    "versesCount": 78,
+    "start": {
+      "surah": 16,
+      "ayah": 51
+    },
+    "end": {
+      "surah": 16,
+      "ayah": 128
+    },
+    "startPage": 272,
+    "endPage": 281
+  },
+  {
+    "id": 29,
+    "name": "الحزب ٢٩",
+    "juz": 15,
+    "firstVerseId": 2030,
+    "lastVerseId": 2127,
+    "versesCount": 98,
+    "start": {
+      "surah": 17,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 17,
+      "ayah": 98
+    },
+    "startPage": 282,
+    "endPage": 292
+  },
+  {
+    "id": 30,
+    "name": "الحزب ٣٠",
+    "juz": 15,
+    "firstVerseId": 2128,
+    "lastVerseId": 2214,
+    "versesCount": 87,
+    "start": {
+      "surah": 17,
+      "ayah": 99
+    },
+    "end": {
+      "surah": 18,
+      "ayah": 74
+    },
+    "startPage": 292,
+    "endPage": 301
+  },
+  {
+    "id": 31,
+    "name": "الحزب ٣١",
+    "juz": 16,
+    "firstVerseId": 2215,
+    "lastVerseId": 2348,
+    "versesCount": 134,
+    "start": {
+      "surah": 18,
+      "ayah": 75
+    },
+    "end": {
+      "surah": 19,
+      "ayah": 98
+    },
+    "startPage": 302,
+    "endPage": 312
+  },
+  {
+    "id": 32,
+    "name": "الحزب ٣٢",
+    "juz": 16,
+    "firstVerseId": 2349,
+    "lastVerseId": 2483,
+    "versesCount": 135,
+    "start": {
+      "surah": 20,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 20,
+      "ayah": 135
+    },
+    "startPage": 312,
+    "endPage": 321
+  },
+  {
+    "id": 33,
+    "name": "الحزب ٣٣",
+    "juz": 17,
+    "firstVerseId": 2484,
+    "lastVerseId": 2595,
+    "versesCount": 112,
+    "start": {
+      "surah": 21,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 21,
+      "ayah": 112
+    },
+    "startPage": 322,
+    "endPage": 331
+  },
+  {
+    "id": 34,
+    "name": "الحزب ٣٤",
+    "juz": 17,
+    "firstVerseId": 2596,
+    "lastVerseId": 2673,
+    "versesCount": 78,
+    "start": {
+      "surah": 22,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 22,
+      "ayah": 78
+    },
+    "startPage": 332,
+    "endPage": 341
+  },
+  {
+    "id": 35,
+    "name": "الحزب ٣٥",
+    "juz": 18,
+    "firstVerseId": 2674,
+    "lastVerseId": 2811,
+    "versesCount": 138,
+    "start": {
+      "surah": 23,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 24,
+      "ayah": 20
+    },
+    "startPage": 342,
+    "endPage": 351
+  },
+  {
+    "id": 36,
+    "name": "الحزب ٣٦",
+    "juz": 18,
+    "firstVerseId": 2812,
+    "lastVerseId": 2875,
+    "versesCount": 64,
+    "start": {
+      "surah": 24,
+      "ayah": 21
+    },
+    "end": {
+      "surah": 25,
+      "ayah": 20
+    },
+    "startPage": 352,
+    "endPage": 361
+  },
+  {
+    "id": 37,
+    "name": "الحزب ٣٧",
+    "juz": 19,
+    "firstVerseId": 2876,
+    "lastVerseId": 3042,
+    "versesCount": 167,
+    "start": {
+      "surah": 25,
+      "ayah": 21
+    },
+    "end": {
+      "surah": 26,
+      "ayah": 110
+    },
+    "startPage": 362,
+    "endPage": 371
+  },
+  {
+    "id": 38,
+    "name": "الحزب ٣٨",
+    "juz": 19,
+    "firstVerseId": 3043,
+    "lastVerseId": 3214,
+    "versesCount": 172,
+    "start": {
+      "surah": 26,
+      "ayah": 111
+    },
+    "end": {
+      "surah": 27,
+      "ayah": 55
+    },
+    "startPage": 371,
+    "endPage": 381
+  },
+  {
+    "id": 39,
+    "name": "الحزب ٣٩",
+    "juz": 20,
+    "firstVerseId": 3215,
+    "lastVerseId": 3302,
+    "versesCount": 88,
+    "start": {
+      "surah": 27,
+      "ayah": 56
+    },
+    "end": {
+      "surah": 28,
+      "ayah": 50
+    },
+    "startPage": 382,
+    "endPage": 391
+  },
+  {
+    "id": 40,
+    "name": "الحزب ٤٠",
+    "juz": 20,
+    "firstVerseId": 3303,
+    "lastVerseId": 3385,
+    "versesCount": 83,
+    "start": {
+      "surah": 28,
+      "ayah": 51
+    },
+    "end": {
+      "surah": 29,
+      "ayah": 45
+    },
+    "startPage": 392,
+    "endPage": 401
+  },
+  {
+    "id": 41,
+    "name": "الحزب ٤١",
+    "juz": 21,
+    "firstVerseId": 3386,
+    "lastVerseId": 3490,
+    "versesCount": 105,
+    "start": {
+      "surah": 29,
+      "ayah": 46
+    },
+    "end": {
+      "surah": 31,
+      "ayah": 21
+    },
+    "startPage": 402,
+    "endPage": 413
+  },
+  {
+    "id": 42,
+    "name": "الحزب ٤٢",
+    "juz": 21,
+    "firstVerseId": 3491,
+    "lastVerseId": 3563,
+    "versesCount": 73,
+    "start": {
+      "surah": 31,
+      "ayah": 22
+    },
+    "end": {
+      "surah": 33,
+      "ayah": 30
+    },
+    "startPage": 413,
+    "endPage": 421
+  },
+  {
+    "id": 43,
+    "name": "الحزب ٤٣",
+    "juz": 22,
+    "firstVerseId": 3564,
+    "lastVerseId": 3629,
+    "versesCount": 66,
+    "start": {
+      "surah": 33,
+      "ayah": 31
+    },
+    "end": {
+      "surah": 34,
+      "ayah": 23
+    },
+    "startPage": 422,
+    "endPage": 431
+  },
+  {
+    "id": 44,
+    "name": "الحزب ٤٤",
+    "juz": 22,
+    "firstVerseId": 3630,
+    "lastVerseId": 3732,
+    "versesCount": 103,
+    "start": {
+      "surah": 34,
+      "ayah": 24
+    },
+    "end": {
+      "surah": 36,
+      "ayah": 27
+    },
+    "startPage": 431,
+    "endPage": 441
+  },
+  {
+    "id": 45,
+    "name": "الحزب ٤٥",
+    "juz": 23,
+    "firstVerseId": 3733,
+    "lastVerseId": 3932,
+    "versesCount": 200,
+    "start": {
+      "surah": 36,
+      "ayah": 28
+    },
+    "end": {
+      "surah": 37,
+      "ayah": 144
+    },
+    "startPage": 442,
+    "endPage": 451
+  },
+  {
+    "id": 46,
+    "name": "الحزب ٤٦",
+    "juz": 23,
+    "firstVerseId": 3933,
+    "lastVerseId": 4089,
+    "versesCount": 157,
+    "start": {
+      "surah": 37,
+      "ayah": 145
+    },
+    "end": {
+      "surah": 39,
+      "ayah": 31
+    },
+    "startPage": 451,
+    "endPage": 461
+  },
+  {
+    "id": 47,
+    "name": "الحزب ٤٧",
+    "juz": 24,
+    "firstVerseId": 4090,
+    "lastVerseId": 4173,
+    "versesCount": 84,
+    "start": {
+      "surah": 39,
+      "ayah": 32
+    },
+    "end": {
+      "surah": 40,
+      "ayah": 40
+    },
+    "startPage": 462,
+    "endPage": 471
+  },
+  {
+    "id": 48,
+    "name": "الحزب ٤٨",
+    "juz": 24,
+    "firstVerseId": 4174,
+    "lastVerseId": 4264,
+    "versesCount": 91,
+    "start": {
+      "surah": 40,
+      "ayah": 41
+    },
+    "end": {
+      "surah": 41,
+      "ayah": 46
+    },
+    "startPage": 472,
+    "endPage": 481
+  },
+  {
+    "id": 49,
+    "name": "الحزب ٤٩",
+    "juz": 25,
+    "firstVerseId": 4265,
+    "lastVerseId": 4348,
+    "versesCount": 84,
+    "start": {
+      "surah": 41,
+      "ayah": 47
+    },
+    "end": {
+      "surah": 43,
+      "ayah": 23
+    },
+    "startPage": 482,
+    "endPage": 491
+  },
+  {
+    "id": 50,
+    "name": "الحزب ٥٠",
+    "juz": 25,
+    "firstVerseId": 4349,
+    "lastVerseId": 4510,
+    "versesCount": 162,
+    "start": {
+      "surah": 43,
+      "ayah": 24
+    },
+    "end": {
+      "surah": 45,
+      "ayah": 37
+    },
+    "startPage": 491,
+    "endPage": 502
+  },
+  {
+    "id": 51,
+    "name": "الحزب ٥١",
+    "juz": 26,
+    "firstVerseId": 4511,
+    "lastVerseId": 4600,
+    "versesCount": 90,
+    "start": {
+      "surah": 46,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 48,
+      "ayah": 17
+    },
+    "startPage": 502,
+    "endPage": 513
+  },
+  {
+    "id": 52,
+    "name": "الحزب ٥٢",
+    "juz": 26,
+    "firstVerseId": 4601,
+    "lastVerseId": 4705,
+    "versesCount": 105,
+    "start": {
+      "surah": 48,
+      "ayah": 18
+    },
+    "end": {
+      "surah": 51,
+      "ayah": 30
+    },
+    "startPage": 513,
+    "endPage": 521
+  },
+  {
+    "id": 53,
+    "name": "الحزب ٥٣",
+    "juz": 27,
+    "firstVerseId": 4706,
+    "lastVerseId": 4901,
+    "versesCount": 196,
+    "start": {
+      "surah": 51,
+      "ayah": 31
+    },
+    "end": {
+      "surah": 54,
+      "ayah": 55
+    },
+    "startPage": 522,
+    "endPage": 531
+  },
+  {
+    "id": 54,
+    "name": "الحزب ٥٤",
+    "juz": 27,
+    "firstVerseId": 4902,
+    "lastVerseId": 5104,
+    "versesCount": 203,
+    "start": {
+      "surah": 55,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 57,
+      "ayah": 29
+    },
+    "startPage": 531,
+    "endPage": 541
+  },
+  {
+    "id": 55,
+    "name": "الحزب ٥٥",
+    "juz": 28,
+    "firstVerseId": 5105,
+    "lastVerseId": 5177,
+    "versesCount": 73,
+    "start": {
+      "surah": 58,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 61,
+      "ayah": 14
+    },
+    "startPage": 542,
+    "endPage": 552
+  },
+  {
+    "id": 56,
+    "name": "الحزب ٥٦",
+    "juz": 28,
+    "firstVerseId": 5178,
+    "lastVerseId": 5241,
+    "versesCount": 64,
+    "start": {
+      "surah": 62,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 66,
+      "ayah": 12
+    },
+    "startPage": 553,
+    "endPage": 561
+  },
+  {
+    "id": 57,
+    "name": "الحزب ٥٧",
+    "juz": 29,
+    "firstVerseId": 5242,
+    "lastVerseId": 5447,
+    "versesCount": 206,
+    "start": {
+      "surah": 67,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 71,
+      "ayah": 28
+    },
+    "startPage": 562,
+    "endPage": 571
+  },
+  {
+    "id": 58,
+    "name": "الحزب ٥٨",
+    "juz": 29,
+    "firstVerseId": 5448,
+    "lastVerseId": 5672,
+    "versesCount": 225,
+    "start": {
+      "surah": 72,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 77,
+      "ayah": 50
+    },
+    "startPage": 572,
+    "endPage": 581
+  },
+  {
+    "id": 59,
+    "name": "الحزب ٥٩",
+    "juz": 30,
+    "firstVerseId": 5673,
+    "lastVerseId": 5948,
+    "versesCount": 276,
+    "start": {
+      "surah": 78,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 86,
+      "ayah": 17
+    },
+    "startPage": 582,
+    "endPage": 591
+  },
+  {
+    "id": 60,
+    "name": "الحزب ٦٠",
+    "juz": 30,
+    "firstVerseId": 5949,
+    "lastVerseId": 6236,
+    "versesCount": 288,
+    "start": {
+      "surah": 87,
+      "ayah": 1
+    },
+    "end": {
+      "surah": 114,
+      "ayah": 6
+    },
+    "startPage": 591,
+    "endPage": 604
+  }
+]

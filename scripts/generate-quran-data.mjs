@@ -8,6 +8,7 @@
  *   src/data/hizb.json             60 hizb boundaries
  *   src/data/search-index.json     6236 verse records powering server-side search
  *   public/data/surah/{1..114}.json  full verse payloads, fetched on demand
+ *   public/data/juz/{1..30}.json     juz payloads, so a juz or hizb is one request
  *
  * Sources
  *   • Uthmani text, transliteration and translations — `quran-json` (CC BY-SA 4.0)
@@ -35,6 +36,7 @@ const ROOT = new URL('..', import.meta.url).pathname;
 const SRC_DATA_DIR = join(ROOT, 'src', 'data');
 const PUBLIC_DATA_DIR = join(ROOT, 'public', 'data');
 const SURAH_DIR = join(PUBLIC_DATA_DIR, 'surah');
+const JUZ_DIR = join(PUBLIC_DATA_DIR, 'juz');
 
 const TOTAL_SURAHS = 114;
 const TOTAL_VERSES = 6236;
@@ -122,13 +124,17 @@ async function main() {
   const arabicById = new Map(arabicChapters.map((chapter) => [chapter.id, chapter]));
 
   await rm(SURAH_DIR, { recursive: true, force: true });
+  await rm(JUZ_DIR, { recursive: true, force: true });
   await mkdir(SURAH_DIR, { recursive: true });
+  await mkdir(JUZ_DIR, { recursive: true });
   await mkdir(SRC_DATA_DIR, { recursive: true });
 
   /** @type {unknown[]} */
   const chapters = [];
   /** @type {unknown[]} */
   const searchIndex = [];
+  /** Every verse in Mus'haf order, used to slice the juz payloads. */
+  const allVerses = [];
   let verseTally = 0;
 
   console.log('▸ Building surah payloads…');
@@ -213,6 +219,7 @@ async function main() {
     };
 
     chapters.push(chapter);
+    allVerses.push(...verses);
 
     await writeJson(join(SURAH_DIR, `${surahNumber}.json`), { chapter, verses });
   }
@@ -281,6 +288,31 @@ async function main() {
     if (hizbList[i].firstVerseId !== hizbList[i - 1].lastVerseId + 1) {
       throw new Error(`Gap between hizb ${i} and ${i + 1}`);
     }
+  }
+
+  /*
+   * Juz payloads.
+   *
+   * Without these, reading a juz means fetching every surah it touches — 37
+   * parallel requests for juz 30, and the whole of Al-Baqarah (274 kB) just to
+   * read the 141 verses juz 1 actually contains. One pre-sliced file per juz
+   * turns that into a single request carrying only the verses needed.
+   *
+   * Hizb payloads are deliberately *not* generated: every hizb falls inside
+   * exactly one juz, so a hizb is served by its juz file plus a range filter —
+   * one request either way, and no second copy of the Mus'haf on disk.
+   */
+  console.log('▸ Writing juz payloads…');
+  for (const juz of juzList) {
+    const verses = allVerses.filter(
+      (verse) => verse.id >= juz.firstVerseId && verse.id <= juz.lastVerseId,
+    );
+    if (verses.length !== juz.versesCount) {
+      throw new Error(
+        `Juz ${juz.id} payload has ${verses.length} verses, expected ${juz.versesCount}`,
+      );
+    }
+    await writeJson(join(JUZ_DIR, `${juz.id}.json`), { juz, verses });
   }
 
   console.log('▸ Writing datasets…');

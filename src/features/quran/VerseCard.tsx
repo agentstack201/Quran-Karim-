@@ -116,17 +116,17 @@ function VerseCardComponent({
       id={`ayah-${verse.ayah}`}
       aria-labelledby={`ayah-${verse.ayah}-label`}
       className={cn(
-        'group scroll-mt-24 border-b border-border px-1 py-7 transition-colors duration-500 last:border-b-0 sm:px-3',
+        'verse-block group scroll-mt-24 border-b border-border px-1 py-6 transition-colors duration-500 last:border-b-0 sm:px-3',
         playing && 'bg-[var(--verse-playing)]',
         !playing && focused && 'bg-[var(--verse-highlight)]',
       )}
     >
-      <h3 id={`ayah-${verse.ayah}-label`} className="sr-only">
+      <h2 id={`ayah-${verse.ayah}-label`} className="sr-only">
         {surahName} — الآية {verse.ayah}
-      </h3>
+      </h2>
 
       <p
-        className="quran-text text-ink"
+        className="quran-text quran-text--flow text-ink"
         // The Uthmani text is authored right-to-left; stating it explicitly
         // keeps the ayah medallion correctly placed even if an ancestor's
         // direction is ever overridden.
@@ -151,13 +151,14 @@ function VerseCardComponent({
         </p>
       )}
 
-      <div
-        className={cn(
-          'mt-4 flex items-center gap-0.5',
-          'opacity-55 transition-opacity duration-200',
-          'group-hover:opacity-100 focus-within:opacity-100 md:opacity-40',
-        )}
-      >
+      {/*
+        Always at full opacity. Fading the whole row at rest looked calmer, but
+        it dropped the ayah reference to a 1.6:1 contrast ratio — an
+        accessibility failure that no amount of restraint justifies. The row
+        recedes through colour instead, and the icon buttons gain contrast on
+        hover and focus.
+      */}
+      <div className="mt-3 flex items-center gap-0.5">
         <span className="me-1.5 rounded-xs bg-surface-sunken px-2 py-1 text-[0.6875rem] font-semibold text-ink-subtle tabular-nums">
           {verse.surah}:{verse.ayah}
         </span>

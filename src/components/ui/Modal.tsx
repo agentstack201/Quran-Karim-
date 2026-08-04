@@ -133,7 +133,13 @@ export function Modal({
           <span className="h-1 w-10 rounded-full bg-border-strong" />
         </div>
 
-        <header className="flex items-start gap-3 border-b border-border px-5 py-4 sm:px-6">
+        {/*
+          Plain divs, not <header>/<footer>. Inside a portal on document.body
+          those elements map to the banner and contentinfo landmarks, which the
+          page already has — and duplicate landmarks make a screen reader's
+          landmark list ambiguous (WCAG 2.2 · 1.3.1).
+        */}
+        <div className="flex items-start gap-3 border-b border-border px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="truncate text-lg font-bold text-ink">
               {title}
@@ -149,16 +155,16 @@ export function Modal({
             {headerActions}
             <IconButton icon="close" label="إغلاق" onClick={onClose} size="sm" />
           </div>
-        </header>
+        </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">
           {children}
         </div>
 
         {footer && (
-          <footer className="flex items-center justify-end gap-2 border-t border-border bg-surface px-5 py-3.5 sm:px-6">
+          <div className="flex items-center justify-end gap-2 border-t border-border bg-surface px-5 py-3.5 sm:px-6">
             {footer}
-          </footer>
+          </div>
         )}
       </div>
     </div>,

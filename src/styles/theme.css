@@ -33,7 +33,12 @@
   /* ---- text ----------------------------------------------------------- */
   --ink: #12211c;
   --ink-muted: #56675f;
-  --ink-subtle: #77877f;
+  /* Darkened from #77877f, which measured 3.3:1 against the paper surface.
+     This value clears 4.5:1 against the *darkest* light surface the app can
+     show — the sunken fill on the beige background — so the 11px labels that
+     use it satisfy WCAG 2.2 · 1.4.3 Contrast (Minimum) everywhere, not just on
+     the default surface. */
+  --ink-subtle: #57685f;
   --ink-inverse: #f8faf9;
 
   /* ---- lines ---------------------------------------------------------- */
@@ -48,7 +53,9 @@
   --primary-soft-hover: #d3e7de;
   --on-primary: #ffffff;
 
-  --accent: #8f6a1c;
+  /* Darkened from #8f6a1c, which measured 4.28:1 on the soft accent fill
+     used by the sajdah badge — just under the 4.5:1 floor for its 11px text. */
+  --accent: #7d5c15;
   --accent-strong: #b8892b;
   --accent-soft: #f7eeda;
   --on-accent: #ffffff;
@@ -85,7 +92,7 @@
 
   /* ---- reader --------------------------------------------------------- */
   --quran-scale: 1;
-  --quran-leading: 2.15;
+  --quran-leading: 1.95;
   --verse-highlight: rgb(15 107 79 / 0.08);
   --verse-playing: rgb(184 137 43 / 0.16);
 }

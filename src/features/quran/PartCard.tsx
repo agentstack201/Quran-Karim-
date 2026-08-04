@@ -13,10 +13,21 @@ import { toArabicNumerals } from '@/utils';
 export function PartCard({
   part,
   kind,
+  headingLevel = 'h2',
 }: {
   readonly part: Juz | Hizb;
   readonly kind: 'juz' | 'hizb';
+  /**
+   * The heading element to render for the card title.
+   *
+   * The same card appears directly under the `h1` on an index page and under an
+   * `h2` section heading on the home page. Hard-coding a level would skip a
+   * level in one of the two — a WCAG 2.2 · 1.3.1 failure — so the caller states
+   * where the card sits in the document outline.
+   */
+  readonly headingLevel?: 'h2' | 'h3';
 }): React.JSX.Element {
+  const Heading = headingLevel;
   const start = getChapter(part.start.surah);
   const end = getChapter(part.end.surah);
   const href = kind === 'juz' ? ROUTES.juz(part.id) : ROUTES.hizb(part.id);
@@ -25,7 +36,7 @@ export function PartCard({
     <CardLink href={href} className="p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-bold text-ink">{part.name}</h3>
+          <Heading className="truncate text-base font-bold text-ink">{part.name}</Heading>
           <p className="mt-1 truncate text-xs text-ink-subtle">
             {start && end ? (
               <>

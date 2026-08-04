@@ -2,7 +2,16 @@ import chaptersData from '@/data/chapters.json';
 import hizbData from '@/data/hizb.json';
 import juzData from '@/data/juz.json';
 import { API_ROUTES } from '@/constants';
-import type { Chapter, ChapterWithVerses, Hizb, Juz, Result, Verse, VerseRange } from '@/types';
+import type {
+  Chapter,
+  ChapterWithVerses,
+  Hizb,
+  Juz,
+  Result,
+  Verse,
+  VerseRange,
+  VerseRef,
+} from '@/types';
 
 /**
  * Quran data access.
@@ -14,6 +23,12 @@ import type { Chapter, ChapterWithVerses, Hizb, Juz, Result, Verse, VerseRange }
  * Verse text is fetched per surah from `/data/surah/{id}.json`, so the client
  * only ever downloads the surah being read, and the service worker turns each
  * one into a permanently offline-available asset after the first visit.
+ *
+ * Juz and hizb reading is served by pre-sliced `/data/juz/{id}.json` payloads.
+ * Assembling a juz from its constituent surahs instead would mean 37 parallel
+ * requests for juz 30, and downloading all of Al-Baqarah to read the 141 verses
+ * that juz 1 actually contains. Every hizb falls inside exactly one juz, so a
+ * hizb reuses its juz payload and filters the range — one request either way.
  */
 
 export const CHAPTERS = chaptersData as readonly Chapter[];
@@ -25,6 +40,9 @@ const CHAPTER_BY_ID = new Map<number, Chapter>(CHAPTERS.map((chapter) => [chapte
 
 /** In-flight and completed surah requests, so a surah is fetched at most once. */
 const surahCache = new Map<number, Promise<Result<ChapterWithVerses>>>();
+
+/** The same memoisation for juz payloads. */
+const juzCache = new Map<number, Promise<Result<readonly Verse[]>>>();
 
 export function getChapter(id: number): Chapter | null {
   return CHAPTER_BY_ID.get(id) ?? null;
@@ -124,40 +142,71 @@ export async function fetchChapter(
   return result;
 }
 
+/** Runtime shape check for a fetched juz payload. */
+function isJuzPayload(value: unknown): value is { verses: readonly Verse[] } {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as { verses?: unknown };
+  if (!Array.isArray(candidate.verses) || candidate.verses.length === 0) return false;
+  const first: unknown = candidate.verses[0];
+  return typeof first === 'object' && first !== null && 'text' in first && 'key' in first;
+}
+
 /**
- * Loads every surah a verse range spans and returns the slice of verses that
- * falls inside it — how juz and hizb reading is assembled.
+ * Loads the verses of one juz.
+ *
+ * Memoised per juz, and failures are evicted so a single flaky request cannot
+ * make a juz permanently unreadable for the session.
  */
-export async function fetchVerseRange(
-  firstVerseId: number,
-  lastVerseId: number,
+export async function fetchJuzVerses(
+  id: number,
   signal?: AbortSignal,
 ): Promise<Result<readonly Verse[]>> {
-  const firstChapter = getChapterByVerseId(firstVerseId);
-  const lastChapter = getChapterByVerseId(lastVerseId);
-
-  if (!firstChapter || !lastChapter) {
-    return { ok: false, error: 'نطاق الآيات غير صحيح' };
+  if (!isValidJuzId(id)) {
+    return { ok: false, error: 'رقم الجزء غير صحيح' };
   }
 
-  const chapterIds: number[] = [];
-  for (let id = firstChapter.id; id <= lastChapter.id; id += 1) chapterIds.push(id);
+  const cached = juzCache.get(id);
+  if (cached) return cached;
 
-  const results = await Promise.all(chapterIds.map((id) => fetchChapter(id, signal)));
+  const request = (async (): Promise<Result<readonly Verse[]>> => {
+    try {
+      const response = await fetch(API_ROUTES.juz(id), {
+        signal: signal ?? null,
+        cache: 'force-cache',
+      });
 
-  const verses: Verse[] = [];
-  for (const result of results) {
-    if (!result.ok) return { ok: false, error: result.error };
-    for (const verse of result.data.verses) {
-      if (verse.id >= firstVerseId && verse.id <= lastVerseId) verses.push(verse);
+      if (!response.ok) {
+        return { ok: false, error: `تعذّر تحميل الجزء (${response.status})` };
+      }
+
+      const payload: unknown = await response.json();
+      if (!isJuzPayload(payload)) {
+        return { ok: false, error: 'بيانات الجزء غير صالحة' };
+      }
+
+      return { ok: true, data: payload.verses };
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return { ok: false, error: 'تم إلغاء الطلب' };
+      }
+      return { ok: false, error: 'تعذّر الاتصال. تحقّق من الإنترنت ثم أعد المحاولة.' };
     }
-  }
+  })();
 
-  if (verses.length === 0) {
-    return { ok: false, error: 'لا توجد آيات في هذا النطاق' };
-  }
+  juzCache.set(id, request);
 
-  return { ok: true, data: verses };
+  const result = await request;
+  if (!result.ok) juzCache.delete(id);
+
+  return result;
+}
+
+/** Builds the human-readable span of a reading range, e.g. "من البقرة ١ إلى…". */
+function describeRange(start: VerseRef, end: VerseRef, versesCount: number): string {
+  const startChapter = getChapter(start.surah);
+  const endChapter = getChapter(end.surah);
+  if (!startChapter || !endChapter) return `${versesCount} آية`;
+  return `من ${startChapter.name} ${start.ayah} إلى ${endChapter.name} ${end.ayah}`;
 }
 
 /** Loads a juz as a reading range. */
@@ -165,11 +214,8 @@ export async function fetchJuzRange(id: number, signal?: AbortSignal): Promise<R
   const juz = getJuz(id);
   if (!juz) return { ok: false, error: 'رقم الجزء غير صحيح' };
 
-  const verses = await fetchVerseRange(juz.firstVerseId, juz.lastVerseId, signal);
+  const verses = await fetchJuzVerses(id, signal);
   if (!verses.ok) return verses;
-
-  const start = getChapter(juz.start.surah);
-  const end = getChapter(juz.end.surah);
 
   return {
     ok: true,
@@ -177,10 +223,7 @@ export async function fetchJuzRange(id: number, signal?: AbortSignal): Promise<R
       mode: 'juz',
       id: juz.id,
       title: juz.name,
-      subtitle:
-        start && end
-          ? `من ${start.name} ${juz.start.ayah} إلى ${end.name} ${juz.end.ayah}`
-          : `${verses.data.length} آية`,
+      subtitle: describeRange(juz.start, juz.end, juz.versesCount),
       verses: verses.data,
       firstVerseId: juz.firstVerseId,
       lastVerseId: juz.lastVerseId,
@@ -188,7 +231,13 @@ export async function fetchJuzRange(id: number, signal?: AbortSignal): Promise<R
   };
 }
 
-/** Loads a hizb as a reading range. */
+/**
+ * Loads a hizb as a reading range.
+ *
+ * Served from the containing juz payload rather than a file of its own: every
+ * hizb sits inside exactly one juz, so this is a single request and costs no
+ * additional bytes in the repository.
+ */
 export async function fetchHizbRange(
   id: number,
   signal?: AbortSignal,
@@ -196,11 +245,16 @@ export async function fetchHizbRange(
   const hizb = getHizb(id);
   if (!hizb) return { ok: false, error: 'رقم الحزب غير صحيح' };
 
-  const verses = await fetchVerseRange(hizb.firstVerseId, hizb.lastVerseId, signal);
-  if (!verses.ok) return verses;
+  const juzVerses = await fetchJuzVerses(hizb.juz, signal);
+  if (!juzVerses.ok) return juzVerses;
 
-  const start = getChapter(hizb.start.surah);
-  const end = getChapter(hizb.end.surah);
+  const verses = juzVerses.data.filter(
+    (verse) => verse.id >= hizb.firstVerseId && verse.id <= hizb.lastVerseId,
+  );
+
+  if (verses.length === 0) {
+    return { ok: false, error: 'لا توجد آيات في هذا النطاق' };
+  }
 
   return {
     ok: true,
@@ -208,11 +262,8 @@ export async function fetchHizbRange(
       mode: 'hizb',
       id: hizb.id,
       title: hizb.name,
-      subtitle:
-        start && end
-          ? `من ${start.name} ${hizb.start.ayah} إلى ${end.name} ${hizb.end.ayah}`
-          : `${verses.data.length} آية`,
-      verses: verses.data,
+      subtitle: describeRange(hizb.start, hizb.end, hizb.versesCount),
+      verses,
       firstVerseId: hizb.firstVerseId,
       lastVerseId: hizb.lastVerseId,
     },

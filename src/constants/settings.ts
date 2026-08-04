@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   surface: 'paper',
   quranScale: 1,
-  quranLeading: 2.15,
+  quranLeading: 1.95,
   showTranslation: false,
   showTransliteration: false,
   reciterId: DEFAULT_RECITER_ID,
@@ -43,7 +43,7 @@ export const QURAN_LEADING = {
   min: 1.6,
   max: 3,
   step: 0.15,
-  default: 2.15,
+  default: 1.95,
 } as const;
 
 /** Maximum number of bookmarks retained; the oldest are dropped beyond this. */

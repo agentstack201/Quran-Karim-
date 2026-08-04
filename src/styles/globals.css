@@ -283,9 +283,24 @@
     font-variant-ligatures: common-ligatures contextual;
     letter-spacing: 0;
     word-spacing: 0.06em;
+    /* Centred by default. Justification is opt-in via .quran-text--flow,
+       because stretching a one-line ayah across a wide card opens gaping word
+       gaps — the exact defect justified text is supposed to prevent. */
+    text-align: center;
+    text-wrap: balance;
+    hanging-punctuation: none;
+  }
+
+  /*
+   * Continuous reading. In the reader, ayat run long and sit in a measured
+   * column, which is where justification earns its place — it is how a printed
+   * Mus'haf sets the page. The last line stays centred so a short tail never
+   * strands itself against one margin.
+   */
+  .quran-text--flow {
     text-align: justify;
     text-align-last: center;
-    hanging-punctuation: none;
+    text-wrap: wrap;
   }
 
   @media (min-width: 48rem) {
@@ -321,16 +336,28 @@
     color: var(--ornament);
   }
 
+  /* Both halves fade outwards from the ornament, so the rule reads as one
+     symmetric line regardless of writing direction. */
   .ornamental-rule::before,
   .ornamental-rule::after {
     content: '';
     flex: 1;
     block-size: 1px;
-    background-image: linear-gradient(
-      to var(--rule-direction, left),
-      transparent,
-      var(--border-strong)
-    );
+    background-image: linear-gradient(to right, transparent, var(--border-strong), transparent);
+  }
+
+  /*
+   * Off-screen verse blocks skip layout and paint entirely.
+   *
+   * Al-Baqarah renders 286 verse blocks in one pass. `content-visibility: auto`
+   * lets the browser skip rendering work for the ones outside the viewport,
+   * which is the difference between a smooth scroll and a stuttering one on a
+   * mid-range phone. The intrinsic size keeps the scrollbar honest so skipped
+   * blocks do not cause the thumb to jump as they are realised.
+   */
+  .verse-block {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 220px;
   }
 
   /* Shimmering placeholder used by every skeleton. */

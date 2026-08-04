@@ -165,7 +165,7 @@ export default function HomePage(): React.JSX.Element {
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {JUZ_LIST.slice(0, 8).map((juz) => (
-              <PartCard key={juz.id} part={juz} kind="juz" />
+              <PartCard key={juz.id} part={juz} kind="juz" headingLevel="h3" />
             ))}
           </div>
         </section>
@@ -180,7 +180,7 @@ export default function HomePage(): React.JSX.Element {
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {HIZB_LIST.slice(0, 8).map((hizb) => (
-              <PartCard key={hizb.id} part={hizb} kind="hizb" />
+              <PartCard key={hizb.id} part={hizb} kind="hizb" headingLevel="h3" />
             ))}
           </div>
         </section>

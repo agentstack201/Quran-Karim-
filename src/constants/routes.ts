@@ -34,6 +34,7 @@ export const API_ROUTES = {
   tafsir: (verseKey: string, tafsirId: number): string =>
     `/api/tafsir/${encodeURIComponent(verseKey)}?edition=${tafsirId}`,
   surah: (id: number): string => `/data/surah/${id}.json`,
+  juz: (id: number): string => `/data/juz/${id}.json`,
 } as const;
 
 /** Primary navigation, rendered in the header and the mobile drawer. */

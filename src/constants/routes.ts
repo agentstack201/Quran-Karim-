@@ -8,7 +8,15 @@ export const ROUTES = {
   home: '/',
   surahIndex: '/surah',
   surah: (id: number): string => `/surah/${id}`,
-  surahAyah: (surah: number, ayah: number): string => `/surah/${surah}#ayah-${ayah}`,
+  /**
+   * Deep link to a single ayah.
+   *
+   * Carries the ayah in both the query and the fragment on purpose: the query
+   * is readable during render (so the reader can highlight the target without
+   * an effect), while the fragment lets the browser restore scroll position
+   * natively on a cold load.
+   */
+  surahAyah: (surah: number, ayah: number): string => `/surah/${surah}?ayah=${ayah}#ayah-${ayah}`,
   juzIndex: '/juz',
   juz: (id: number): string => `/juz/${id}`,
   hizbIndex: '/hizb',

@@ -26,7 +26,7 @@
  * Bump on every deploy that changes the precache list or a strategy.
  * Old caches are deleted on activate.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 
 const CACHES = {
   shell: `tilawa-shell-${VERSION}`,
@@ -48,9 +48,18 @@ const OFFLINE_URL = '/offline';
 const PRECACHE_URLS = [
   '/',
   OFFLINE_URL,
+  // Browsing indexes: their data is bundled, so they are fully usable offline.
   '/surah',
   '/juz',
   '/hizb',
+  // Bookmarks and settings live entirely in LocalStorage, so this page works
+  // perfectly with no network — but only if the shell itself is cached. It was
+  // not, and an offline reader reaching for their saved ayat got the offline
+  // page instead. Search is precached for the same reason: full-text search
+  // needs the network, but the page explains that rather than failing blankly.
+  '/bookmarks',
+  '/search',
+  '/about',
   '/manifest.webmanifest',
   '/icons/favicon.svg',
   '/icons/icon-192.png',

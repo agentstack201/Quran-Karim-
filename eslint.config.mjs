@@ -67,6 +67,30 @@ const config = [
     files: ['scripts/**/*.mjs'],
     rules: { 'no-console': 'off' },
   },
+
+  {
+    /*
+     * The framework-free build under html-version/ is classic browser
+     * JavaScript: two <script> tags sharing one global scope, with no modules
+     * and no bundler. `CHAPTERS` is declared in data.js and consumed by
+     * script.js, which the module-aware rules read as an unused variable.
+     */
+    files: ['html-version/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        CHAPTERS: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        localStorage: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-console': 'off',
+    },
+  },
 ];
 
 export default config;

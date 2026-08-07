@@ -237,7 +237,9 @@ body {
   padding: 0.4rem 0.75rem;
   border-radius: calc(var(--radius-sm) - 0.15rem);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .segment:hover {
@@ -301,7 +303,10 @@ body {
   font: inherit;
   text-align: start;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 li:has(> .chapter-card[aria-expanded='true']) .chapter-card {

@@ -94,6 +94,7 @@ npm run build && npm start
 **Requirements:** Node.js `>= 20.9.0`.
 
 No environment variables are required — the app runs fully out of the box.
+For deploying to your own domain, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ### Scripts
 

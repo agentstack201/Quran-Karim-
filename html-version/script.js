@@ -47,9 +47,12 @@ function buildDetails(chapter) {
   details.className = 'chapter-details';
 
   const entries = [
-    ['الجزء', chapter.startJuz === chapter.endJuz
-      ? toArabicNumerals(chapter.startJuz)
-      : `${toArabicNumerals(chapter.startJuz)}–${toArabicNumerals(chapter.endJuz)}`],
+    [
+      'الجزء',
+      chapter.startJuz === chapter.endJuz
+        ? toArabicNumerals(chapter.startJuz)
+        : `${toArabicNumerals(chapter.startJuz)}–${toArabicNumerals(chapter.endJuz)}`,
+    ],
     ['الصفحات', `${toArabicNumerals(chapter.startPage)}–${toArabicNumerals(chapter.endPage)}`],
     ['عدد الأركاع', toArabicNumerals(chapter.rukuCount)],
     ['البسملة', chapter.hasBasmalah ? 'نعم' : 'لا'],
@@ -73,7 +76,10 @@ function buildCard(chapter) {
   button.type = 'button';
   button.className = 'chapter-card';
   button.setAttribute('aria-expanded', 'false');
-  button.setAttribute('aria-label', `سورة ${chapter.nameSimple}، ${toArabicNumerals(chapter.versesCount)} آية — عرض التفاصيل`);
+  button.setAttribute(
+    'aria-label',
+    `سورة ${chapter.nameSimple}، ${toArabicNumerals(chapter.versesCount)} آية — عرض التفاصيل`,
+  );
 
   const number = document.createElement('span');
   number.className = 'chapter-number';
@@ -178,7 +184,9 @@ searchInput.addEventListener('input', (event) => {
 document.querySelectorAll('[data-sort]').forEach((button) => {
   button.addEventListener('click', () => {
     state.sort = button.dataset.sort;
-    document.querySelectorAll('[data-sort]').forEach((b) => b.classList.toggle('is-active', b === button));
+    document
+      .querySelectorAll('[data-sort]')
+      .forEach((b) => b.classList.toggle('is-active', b === button));
     render();
   });
 });
@@ -186,7 +194,9 @@ document.querySelectorAll('[data-sort]').forEach((button) => {
 document.querySelectorAll('[data-filter]').forEach((button) => {
   button.addEventListener('click', () => {
     state.filter = button.dataset.filter;
-    document.querySelectorAll('[data-filter]').forEach((b) => b.classList.toggle('is-active', b === button));
+    document
+      .querySelectorAll('[data-filter]')
+      .forEach((b) => b.classList.toggle('is-active', b === button));
     render();
   });
 });

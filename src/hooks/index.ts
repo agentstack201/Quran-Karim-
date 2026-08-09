@@ -18,3 +18,4 @@ export { useSearch } from './useSearch';
 export type { SearchState } from './useSearch';
 export { useTafsir } from './useTafsir';
 export type { TafsirState } from './useTafsir';
+export { useWakeLock } from './useWakeLock';

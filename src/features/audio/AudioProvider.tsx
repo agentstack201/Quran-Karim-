@@ -12,9 +12,37 @@ import {
 } from 'react';
 import { buildAyahAudioUrl, getReciter } from '@/constants';
 import { useSettings } from '@/features/settings/SettingsProvider';
-import { getChapter } from '@/services/quran';
+import { useWakeLock } from '@/hooks';
+import { fetchChapter, getChapter } from '@/services/quran';
 import type { AsyncStatus } from '@/types';
-import { clamp } from '@/utils';
+import { clamp, excerpt, toArabicNumerals } from '@/utils';
+
+/**
+ * How many upcoming ayat are warmed into the HTTP cache while the current one
+ * plays.
+ *
+ * Two is the point of diminishing returns: it covers the next transition and
+ * the one after it, which is enough to absorb a brief stall without competing
+ * with the audio that is actually playing for bandwidth.
+ */
+const PREFETCH_AHEAD = 2;
+
+/** Upper bound on remembered prefetches, so a long recitation cannot grow unbounded. */
+const PREFETCH_MEMORY = 200;
+
+/**
+ * `navigator.connection`, which no TypeScript DOM lib declares yet.
+ *
+ * Only `saveData` is read: a reader who has asked their browser to conserve
+ * data has not asked us to speculatively download two extra ayat.
+ */
+type ConnectionInfo = { readonly saveData?: boolean };
+
+function prefersReducedData(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const connection = (navigator as Navigator & { connection?: ConnectionInfo }).connection;
+  return connection?.saveData === true;
+}
 
 /** The verse currently loaded into the player. */
 export type AudioTrack = {
@@ -76,6 +104,24 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
   // effects (never during render) so React's concurrent rendering stays safe.
   const trackRef = useRef<AudioTrack | null>(null);
   const settingsRef = useRef(settings);
+
+  /** Audio URLs already warmed this session, so a replay costs nothing. */
+  const prefetchedRef = useRef<Set<string>>(new Set());
+
+  /**
+   * Uthmani text of the ayah being recited, resolved for the lock-screen card.
+   *
+   * Looked up here rather than passed in by callers: `fetchChapter` memoises
+   * per surah, and the reader has already loaded the surah being recited, so
+   * this resolves from memory without a request — and it keeps working when
+   * playback advances to an ayah no component asked for.
+   *
+   * Stored with the verse it belongs to and matched during render, so an ayah
+   * can never briefly be captioned with the previous ayah's words.
+   */
+  const [resolvedText, setResolvedText] = useState<{ key: string; text: string } | null>(null);
+  const trackKey = track ? `${track.surah}:${track.ayah}` : null;
+  const trackText = resolvedText?.key === trackKey ? resolvedText.text : null;
 
   useEffect(() => {
     trackRef.current = track;
@@ -287,6 +333,80 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
     };
   }, [getAudio, load]);
 
+  /**
+   * Warms the next few ayat into the browser's HTTP cache.
+   *
+   * The gap between ayat was never decode time — it was a cold network request
+   * issued at the exact moment the previous ayah fell silent. Fetching ahead
+   * moves that request into the seconds where the reader is still listening, so
+   * the swap to the next `src` is served from cache and the recitation runs on.
+   *
+   * The response body is consumed rather than cancelled: an abandoned stream
+   * may never finish, and a partially downloaded file is not a cache entry.
+   */
+  useEffect(() => {
+    if (!track || status !== 'success' || prefersReducedData()) return;
+
+    const reciter = getReciter(settings.reciterId);
+    const index = track.queue.indexOf(track.ayah);
+    if (index === -1) return;
+
+    const upcoming = track.queue
+      .slice(index + 1, index + 1 + PREFETCH_AHEAD)
+      .map((ayah) => buildAyahAudioUrl(reciter, track.surah, ayah))
+      .filter((url) => !prefetchedRef.current.has(url));
+
+    if (upcoming.length === 0) return;
+
+    const controller = new AbortController();
+
+    void (async () => {
+      for (const url of upcoming) {
+        try {
+          const response = await fetch(url, {
+            signal: controller.signal,
+            credentials: 'omit',
+            mode: 'cors',
+          });
+          if (!response.ok) continue;
+          await response.arrayBuffer();
+
+          const seen = prefetchedRef.current;
+          if (seen.size >= PREFETCH_MEMORY) seen.clear();
+          seen.add(url);
+        } catch {
+          // Aborted, offline, or the file is missing for this reciter. Playback
+          // will discover the same thing and report it properly; a failed
+          // speculative fetch is not itself an error.
+          return;
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [track, status, settings.reciterId]);
+
+  /** Resolves the text of the ayah being recited, for the lock-screen card. */
+  useEffect(() => {
+    if (!track || !trackKey) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      const result = await fetchChapter(track.surah);
+      if (cancelled || !result.ok) return;
+      const verse = result.data.verses.find((item) => item.ayah === track.ayah);
+      if (verse) setResolvedText({ key: trackKey, text: verse.text });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [track, trackKey]);
+
+  /** Keep the screen awake while a recitation is actually running. */
+  useWakeLock(playing);
+
   // Keep the element in sync with the persisted volume and rate.
   useEffect(() => {
     const audio = audioRef.current;
@@ -313,10 +433,15 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
     if (!('mediaSession' in navigator) || !track) return;
 
     const reciter = getReciter(settings.reciterId);
+    const reference = `${track.surahName} — الآية ${toArabicNumerals(track.ayah)}`;
+
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: `${track.surahName} — الآية ${track.ayah}`,
+      // The ayah itself leads, with the reference beneath it: a reader who
+      // glances at a locked phone mid-recitation should see the words being
+      // recited, not a catalogue number.
+      title: trackText ? excerpt(trackText, 90) : reference,
       artist: reciter.name,
-      album: 'تلاوة',
+      album: trackText ? reference : 'تلاوة',
       artwork: [
         { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -325,12 +450,29 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
 
     navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
 
+    /** Nudges the position by a signed offset, defaulting to the platform's ask. */
+    const seekBy =
+      (direction: 1 | -1): MediaSessionActionHandler =>
+      (details) => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        seek(audio.currentTime + direction * (details.seekOffset ?? 10));
+      };
+
     const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
       ['play', resume],
       ['pause', pause],
       ['nexttrack', next],
       ['previoustrack', previous],
       ['stop', stop],
+      [
+        'seekto',
+        (details) => {
+          if (typeof details.seekTime === 'number') seek(details.seekTime);
+        },
+      ],
+      ['seekbackward', seekBy(-1)],
+      ['seekforward', seekBy(1)],
     ];
 
     for (const [action, handler] of handlers) {
@@ -350,7 +492,37 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
         }
       }
     };
-  }, [track, playing, settings.reciterId, resume, pause, next, previous, stop]);
+  }, [track, trackText, playing, settings.reciterId, resume, pause, next, previous, stop, seek]);
+
+  /**
+   * Publish playback position, so the lock screen draws a real progress bar and
+   * its scrubber has something to scrub.
+   *
+   * Kept apart from the metadata effect because it updates several times a
+   * second, and rebuilding `MediaMetadata` at that rate makes some platforms
+   * flicker the notification. The guards are not defensive padding:
+   * `setPositionState` throws a `TypeError` on a non-finite duration or a
+   * position past its end, both of which occur normally while a new ayah loads.
+   */
+  useEffect(() => {
+    if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return;
+
+    if (!track || !Number.isFinite(duration) || duration <= 0) {
+      navigator.mediaSession.setPositionState();
+      return;
+    }
+
+    try {
+      navigator.mediaSession.setPositionState({
+        duration,
+        position: clamp(currentTime, 0, duration),
+        playbackRate: settings.playbackRate > 0 ? settings.playbackRate : 1,
+      });
+    } catch {
+      // A racing `src` swap can invalidate the values between the check and the
+      // call; the next tick publishes a consistent pair.
+    }
+  }, [track, currentTime, duration, settings.playbackRate]);
 
   const value = useMemo<AudioContextValue>(
     () => ({

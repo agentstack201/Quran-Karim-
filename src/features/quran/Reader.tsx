@@ -150,11 +150,61 @@ export function Reader({
     return map;
   }, [verses]);
 
-  /** Records the entry point so "continue reading" resumes here. */
+  /**
+   * Records where the reader actually is, not where the range begins.
+   *
+   * This used to store `verses[0]` on mount, which meant "continue reading"
+   * always returned to the top of the surah — you could stop at Al-Kahf 70 and
+   * be sent back to verse 1 the next day, with a progress bar that agreed.
+   *
+   * The observed band sits in the upper third of the viewport rather than
+   * spanning it: that is where the eye rests while reading, and a full-height
+   * root would resolve to whichever verse merely happens to be tallest.
+   * Verses are identified by their index in the range, because ayah numbers
+   * restart at every surah boundary and a juz spans several.
+   */
   useEffect(() => {
-    const first = verses[0];
-    if (!first) return;
-    recordLastRead({ surah: first.surah, ayah: first.ayah, surahName });
+    const container = containerRef.current;
+    if (!container || verses.length === 0) return;
+
+    const nodes = container.querySelectorAll<HTMLElement>('[data-verse-index]');
+    if (nodes.length === 0) return;
+
+    const visible = new Set<number>();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const index = Number(entry.target.getAttribute('data-verse-index'));
+          if (!Number.isInteger(index)) continue;
+          if (entry.isIntersecting) visible.add(index);
+          else visible.delete(index);
+        }
+
+        // Scrolling past the band momentarily empties the set; keeping the last
+        // known position is more useful than recording nothing.
+        if (visible.size === 0) return;
+
+        const topmost = verses[Math.min(...visible)];
+        if (!topmost) return;
+
+        // Coalesced, because a fast scroll crosses many thresholds and each
+        // write reaches LocalStorage.
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          recordLastRead({ surah: topmost.surah, ayah: topmost.ayah, surahName });
+        }, 400);
+      },
+      { rootMargin: '-12% 0px -62% 0px' },
+    );
+
+    for (const node of nodes) observer.observe(node);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [verses, recordLastRead, surahName]);
 
   /**
@@ -255,7 +305,7 @@ export function Reader({
         {status === 'success' && (
           <div role="list" aria-label={`آيات ${surahName}`}>
             {verses.map((verse, index) => (
-              <div role="listitem" key={verse.id}>
+              <div role="listitem" key={verse.id} data-verse-index={index}>
                 <VerseCard
                   verse={verse}
                   surahName={surahName}

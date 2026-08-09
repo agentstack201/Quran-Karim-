@@ -8,8 +8,15 @@ import { useAudio } from '@/features/audio/AudioProvider';
 import { useBookmarks } from '@/features/bookmarks/BookmarksProvider';
 import { useSettings } from '@/features/settings/SettingsProvider';
 import { useKeyboardShortcuts, scrollIntoView } from '@/hooks';
-import { fetchChapter, fetchHizbRange, fetchJuzRange, fetchPageRange } from '@/services/quran';
+import {
+  fetchChapter,
+  fetchHizbRange,
+  fetchJuzRange,
+  fetchPageRange,
+  getChapter,
+} from '@/services/quran';
 import type { AsyncStatus, ReadingMode, Verse } from '@/types';
+import { ShareAyahDialog } from '@/features/share/ShareAyahDialog';
 import { TafsirDialog } from './TafsirDialog';
 import { VerseCard } from './VerseCard';
 
@@ -78,6 +85,7 @@ export function Reader({
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [tafsirVerse, setTafsirVerse] = useState<Verse | null>(null);
+  const [shareVerse, setShareVerse] = useState<Verse | null>(null);
 
   const searchParams = useSearchParams();
   const { settings } = useSettings();
@@ -245,6 +253,7 @@ export function Reader({
   }, [track, playing, settings.autoScroll]);
 
   const onOpenTafsir = useCallback((verse: Verse) => setTafsirVerse(verse), []);
+  const onShare = useCallback((verse: Verse) => setShareVerse(verse), []);
 
   /** Play/pause and bookmark act on the ayah being recited, else the first. */
   const activeVerse = useMemo(() => {
@@ -313,6 +322,7 @@ export function Reader({
                   surahName={surahName}
                   queue={queuesBySurah.get(verse.surah) ?? [verse.ayah]}
                   onOpenTafsir={onOpenTafsir}
+                  onShare={onShare}
                   playing={track?.surah === verse.surah && track.ayah === verse.ayah && playing}
                   focused={focusedAyah === verse.ayah}
                   deferred={index >= DEFERRED_RENDER_FROM}
@@ -330,6 +340,11 @@ export function Reader({
       </div>
 
       <TafsirDialog verse={tafsirVerse} onClose={() => setTafsirVerse(null)} />
+      <ShareAyahDialog
+        verse={shareVerse}
+        surahName={shareVerse ? (getChapter(shareVerse.surah)?.name ?? surahName) : surahName}
+        onClose={() => setShareVerse(null)}
+      />
     </>
   );
 }

@@ -43,6 +43,37 @@ export function canShare(): boolean {
   return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 }
 
+/**
+ * True when the platform can share this particular file.
+ *
+ * Asked per-file rather than once: `navigator.share` existing says nothing
+ * about file support, and several platforms accept text while rejecting
+ * attachments. Getting this wrong throws mid-share, after the user has already
+ * committed to the action.
+ */
+export function canShareFiles(files: readonly File[]): boolean {
+  if (typeof navigator === 'undefined' || typeof navigator.canShare !== 'function') return false;
+  try {
+    return navigator.canShare({ files: [...files] });
+  } catch {
+    return false;
+  }
+}
+
+/** Saves a blob to the reader's device, for platforms without a share sheet. */
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Revoked on the next frame rather than immediately: Safari cancels a
+  // download whose object URL is released before it has begun.
+  requestAnimationFrame(() => URL.revokeObjectURL(url));
+}
+
 export type ShareOutcome = 'shared' | 'cancelled' | 'unsupported' | 'failed';
 
 /** Opens the native share sheet. Distinguishes user cancellation from failure. */

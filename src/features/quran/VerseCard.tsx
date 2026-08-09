@@ -1,13 +1,12 @@
 'use client';
 
 import { memo, useCallback, useMemo, useState } from 'react';
-import { ROUTES, SITE_URL } from '@/constants';
 import { Icon, IconButton, useToast } from '@/components/ui';
 import { useAudio } from '@/features/audio/AudioProvider';
 import { useBookmarks } from '@/features/bookmarks/BookmarksProvider';
 import { useSettings } from '@/features/settings/SettingsProvider';
 import type { MemorizationMask, Verse } from '@/types';
-import { canShare, cn, copyToClipboard, formatAyahForSharing, shareContent } from '@/utils';
+import { cn, copyToClipboard, formatAyahForSharing } from '@/utils';
 
 export type VerseCardProps = {
   readonly verse: Verse;
@@ -15,6 +14,14 @@ export type VerseCardProps = {
   /** Ayah numbers forming the playback queue this verse belongs to. */
   readonly queue: readonly number[];
   readonly onOpenTafsir: (verse: Verse) => void;
+  /**
+   * Opens the share sheet.
+   *
+   * Raised to the reader rather than handled here: one dialog for the range
+   * instead of one per verse, which in Al-Baqarah is the difference between a
+   * single mounted sheet and 286 of them.
+   */
+  readonly onShare: (verse: Verse) => void;
   /** Highlighted because it is being recited. */
   readonly playing: boolean;
   /** Highlighted because it was the navigation target. */
@@ -48,6 +55,7 @@ function VerseCardComponent({
   surahName,
   queue,
   onOpenTafsir,
+  onShare,
   playing,
   focused,
   deferred,
@@ -118,33 +126,6 @@ function VerseCardComponent({
       }),
     );
     toast(copied ? 'تم نسخ الآية' : 'تعذّر النسخ إلى الحافظة', {
-      tone: copied ? 'success' : 'error',
-    });
-  }, [verse.text, verse.surah, verse.ayah, surahName, toast]);
-
-  const onShare = useCallback(async () => {
-    const url = `${SITE_URL}${ROUTES.surahAyah(verse.surah, verse.ayah)}`;
-    const text = formatAyahForSharing({
-      text: verse.text,
-      surahName,
-      surah: verse.surah,
-      ayah: verse.ayah,
-    });
-
-    if (canShare()) {
-      const outcome = await shareContent({
-        title: `${surahName} — الآية ${verse.ayah}`,
-        text,
-        url,
-      });
-      if (outcome === 'failed') toast('تعذّرت المشاركة', { tone: 'error' });
-      return;
-    }
-
-    // No share sheet on this platform — copying the same payload is the
-    // closest useful equivalent.
-    const copied = await copyToClipboard(`${text}\n${url}`);
-    toast(copied ? 'تم نسخ الآية ورابطها' : 'تعذّرت المشاركة', {
       tone: copied ? 'success' : 'error',
     });
   }, [verse.text, verse.surah, verse.ayah, surahName, toast]);
@@ -246,7 +227,7 @@ function VerseCardComponent({
           size="sm"
         />
         <IconButton icon="copy" label="نسخ الآية" onClick={onCopy} size="sm" />
-        <IconButton icon="share" label="مشاركة الآية" onClick={onShare} size="sm" />
+        <IconButton icon="share" label="مشاركة الآية" onClick={() => onShare(verse)} size="sm" />
 
         {settings.memorizationMask !== 'none' && (
           <IconButton
@@ -277,6 +258,7 @@ export const VerseCard = memo(VerseCardComponent, (previous, next) => {
     previous.focused === next.focused &&
     previous.surahName === next.surahName &&
     previous.queue === next.queue &&
-    previous.onOpenTafsir === next.onOpenTafsir
+    previous.onOpenTafsir === next.onOpenTafsir &&
+    previous.onShare === next.onShare
   );
 });

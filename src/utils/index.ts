@@ -21,5 +21,12 @@ export {
   round,
 } from './format';
 
-export { canShare, copyToClipboard, formatAyahForSharing, shareContent } from './share';
+export {
+  canShare,
+  canShareFiles,
+  copyToClipboard,
+  downloadBlob,
+  formatAyahForSharing,
+  shareContent,
+} from './share';
 export type { ShareOutcome } from './share';

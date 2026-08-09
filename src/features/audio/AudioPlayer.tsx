@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PLAYBACK_RATES, RECITERS, ROUTES, getReciter } from '@/constants';
+import { PLAYBACK_RATES, RECITERS, REPEAT_CHOICES, ROUTES, getReciter } from '@/constants';
 import { Icon, IconButton, Select } from '@/components/ui';
 import { useSettings } from '@/features/settings/SettingsProvider';
 import { useKeyboardShortcuts } from '@/hooks';
@@ -49,9 +49,23 @@ export function AudioPlayer(): React.JSX.Element | null {
   if (!track) return null;
 
   const reciter = getReciter(settings.reciterId);
-  const queueIndex = track.queue.indexOf(track.ayah);
+  const queueIndex = track.index;
   const atStart = queueIndex <= 0;
   const atEnd = queueIndex === -1 || queueIndex >= track.queue.length - 1;
+  const repeating = settings.repeatEach > 1 || settings.repeatRange > 1;
+
+  /**
+   * Which pass of the current ayah is being heard.
+   *
+   * Counted from the queue rather than tracked separately: repeats are
+   * contiguous, so the run containing the cursor is the answer.
+   */
+  const repeatPass = (() => {
+    if (settings.repeatEach <= 1 || queueIndex < 0) return null;
+    let start = queueIndex;
+    while (start > 0 && track.queue[start - 1] === track.ayah) start -= 1;
+    return { current: queueIndex - start + 1, total: settings.repeatEach };
+  })();
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const muted = settings.volume === 0;
 
@@ -134,6 +148,11 @@ export function AudioPlayer(): React.JSX.Element | null {
                 {' '}
                 — الآية {toArabicNumerals(track.ayah)}
               </span>
+              {repeatPass && (
+                <span className="ms-2 rounded-xs bg-accent-soft px-1.5 py-0.5 align-middle text-[0.6875rem] font-semibold text-accent tabular-nums">
+                  {toArabicNumerals(repeatPass.current)}/{toArabicNumerals(repeatPass.total)}
+                </span>
+              )}
             </Link>
             <p className="truncate text-xs text-ink-subtle">
               {error ? (
@@ -159,6 +178,17 @@ export function AudioPlayer(): React.JSX.Element | null {
               className="hidden sm:inline-flex"
             />
             <IconButton
+              icon="reset"
+              label={repeating ? 'إيقاف التكرار' : 'تكرار الآية للحفظ'}
+              onClick={() => {
+                update('repeatEach', repeating ? 1 : 3);
+                if (repeating) update('repeatRange', 1);
+              }}
+              size="sm"
+              active={repeating}
+              className={cn(repeating && 'text-accent')}
+            />
+            <IconButton
               icon={expanded ? 'chevronDown' : 'chevronUp'}
               label={expanded ? 'إخفاء خيارات التلاوة' : 'خيارات التلاوة'}
               aria-expanded={expanded}
@@ -180,6 +210,24 @@ export function AudioPlayer(): React.JSX.Element | null {
             id="audio-options"
             className="mt-3 grid animate-[var(--animate-fade-in)] gap-3 border-t border-border pt-3 sm:grid-cols-3"
           >
+            <Select
+              label="تكرار الآية"
+              value={String(settings.repeatEach)}
+              onChange={(value) => update('repeatEach', Number(value))}
+              options={REPEAT_CHOICES.map((count) => ({
+                value: String(count),
+                label: count === 1 ? 'بدون تكرار' : `${toArabicNumerals(count)} مرات`,
+              }))}
+            />
+            <Select
+              label="تكرار المقطع"
+              value={String(settings.repeatRange)}
+              onChange={(value) => update('repeatRange', Number(value))}
+              options={REPEAT_CHOICES.map((count) => ({
+                value: String(count),
+                label: count === 1 ? 'مرة واحدة' : `${toArabicNumerals(count)} مرات`,
+              }))}
+            />
             <Select
               label="القارئ"
               value={settings.reciterId}

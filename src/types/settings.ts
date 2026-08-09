@@ -21,6 +21,14 @@ export type Surface = 'paper' | 'beige' | 'white';
  */
 export type BackgroundChoice = Surface | 'dark';
 
+/**
+ * How much of the Quranic text is concealed for memorisation practice.
+ *
+ * `firstWord` is the middle rung that makes the ladder work: the opening word
+ * is the cue a memoriser actually uses to recall the rest of the ayah.
+ */
+export type MemorizationMask = 'none' | 'firstWord' | 'hidden';
+
 /** Persisted user settings. */
 export type Settings = {
   readonly theme: ThemePreference;
@@ -42,6 +50,12 @@ export type Settings = {
   readonly playbackRate: number;
   /** 0–1. */
   readonly volume: number;
+  /** Times each ayah is repeated before moving on. 1 disables repetition. */
+  readonly repeatEach: number;
+  /** Times the passage is repeated as a whole. 1 disables repetition. */
+  readonly repeatRange: number;
+  /** How much of the Quranic text is concealed while memorising. */
+  readonly memorizationMask: MemorizationMask;
 };
 
 /** A saved position in the Mus'haf. */

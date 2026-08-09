@@ -386,6 +386,32 @@
     contain-intrinsic-size: auto 220px;
   }
 
+  /*
+   * Concealed word, for memorisation practice.
+   *
+   * Redacted rather than removed: the text keeps its place in the line, so the
+   * ayah's shape — how many words, how long each one is — stays readable while
+   * the words themselves do not. That outline is the scaffold a memoriser
+   * recites against, and hiding it entirely would take the exercise with it.
+   *
+   * The text stays in the DOM and in the accessibility tree; only its colour is
+   * removed, so a screen-reader user is never locked out of the verse.
+   */
+  .verse-masked {
+    color: transparent;
+    background-color: color-mix(in srgb, var(--ink) 11%, transparent);
+    border-radius: var(--radius-xs);
+    /* Without this a word wrapping across two lines loses its rounded ends. */
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out-soft);
+  }
+
+  .verse-masked::selection {
+    color: transparent;
+  }
+
   /* Shimmering placeholder used by every skeleton. */
   .skeleton {
     background-image: linear-gradient(

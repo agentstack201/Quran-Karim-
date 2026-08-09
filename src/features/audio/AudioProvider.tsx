@@ -17,6 +17,7 @@ import { fetchChapter, getChapter } from '@/services/quran';
 import type { AsyncStatus } from '@/types';
 import { clamp, excerpt, toArabicNumerals } from '@/utils';
 import { GaplessEngine, type EngineSnapshot } from './GaplessEngine';
+import { buildRepeatQueue, passageFrom } from './queue';
 
 /** The verse currently loaded into the player. */
 export type AudioTrack = {
@@ -25,6 +26,13 @@ export type AudioTrack = {
   readonly surahName: string;
   /** Ayah numbers available in the active playback queue. */
   readonly queue: readonly number[];
+  /**
+   * Position within that queue.
+   *
+   * Carried explicitly because a memorisation queue repeats ayah numbers, so
+   * looking one up finds its first occurrence rather than the one being heard.
+   */
+  readonly index: number;
 };
 
 type AudioContextValue = {
@@ -130,6 +138,7 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
       ayah: snapshot.ayah,
       surahName: chapter?.name ?? '',
       queue: snapshot.queue,
+      index: snapshot.index,
     };
   }, [snapshot]);
 
@@ -184,10 +193,27 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
           ? Array.from({ length: chapter.versesCount }, (_, index) => index + 1)
           : [input.ayah]);
 
-      // With continuous playback off, the queue is the single ayah asked for —
+      const { continuousPlayback, repeatEach, repeatRange } = settingsRef.current;
+      const repeating = repeatEach > 1 || repeatRange > 1;
+
+      // With continuous playback off, the passage is the single ayah asked for —
       // which is exactly what "play this verse and stop" means, and it keeps the
       // engine from scheduling a successor it must then discard.
-      const queue = settingsRef.current.continuousPlayback ? full : [input.ayah];
+      //
+      // While repeating, the passage begins at the chosen ayah rather than
+      // carrying the whole surah: a repeat session practises forward from where
+      // it was started. Without repeats the full queue is kept, so stepping
+      // backwards still reaches the ayat above it.
+      let queue: readonly number[];
+      if (!continuousPlayback) {
+        queue = repeating
+          ? buildRepeatQueue([input.ayah], { repeatEach, repeatRange })
+          : [input.ayah];
+      } else if (repeating) {
+        queue = buildRepeatQueue(passageFrom(full, input.ayah), { repeatEach, repeatRange });
+      } else {
+        queue = full;
+      }
 
       void getEngine().play({ surah: input.surah, ayah: input.ayah, queue });
     },
@@ -218,6 +244,26 @@ export function AudioProvider({ children }: { readonly children: ReactNode }): R
   useEffect(() => {
     void engineRef.current?.setRate(clamp(settings.playbackRate, 0.5, 2));
   }, [settings.playbackRate]);
+
+  /**
+   * Changing the repetition while listening rebuilds the queue from the ayah
+   * being heard.
+   *
+   * Asking for five repeats and being told to wait until the next session would
+   * be the wrong answer: the setting exists to be felt immediately. Restarting
+   * the current ayah is the smallest change that can honour it.
+   */
+  const { repeatEach, repeatRange } = settings;
+  const firstRepeatRun = useRef(true);
+  useEffect(() => {
+    if (firstRepeatRun.current) {
+      firstRepeatRun.current = false;
+      return;
+    }
+    const current = engineRef.current?.snapshot();
+    if (!current || current.ayah === 0) return;
+    play({ surah: current.surah, ayah: current.ayah });
+  }, [repeatEach, repeatRange, play]);
 
   /** Changing reciter mid-recitation restarts the same ayah in the new voice. */
   const reciterId = settings.reciterId;

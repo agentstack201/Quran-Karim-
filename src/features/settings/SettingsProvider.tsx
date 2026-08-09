@@ -9,6 +9,7 @@ import {
   getReciter,
   getTafsirEdition,
 } from '@/constants';
+import { MAX_REPEAT_EACH, MAX_REPEAT_RANGE } from '@/features/audio/queue';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePrefersDark } from '@/hooks/useMediaQuery';
 import type { BackgroundChoice, ResolvedTheme, Settings, Surface, ThemePreference } from '@/types';
@@ -90,6 +91,19 @@ function parseSettings(raw: unknown): Settings | null {
     autoScroll: booleanOr(stored.autoScroll, DEFAULT_SETTINGS.autoScroll),
     playbackRate: numberOr(stored.playbackRate, DEFAULT_SETTINGS.playbackRate, 0.5, 2),
     volume: numberOr(stored.volume, DEFAULT_SETTINGS.volume, 0, 1),
+    // Rounded as well as clamped: a fractional repeat count would silently
+    // truncate later, and reading it back as a whole number keeps the control
+    // and the stored value agreeing.
+    repeatEach: Math.round(
+      numberOr(stored.repeatEach, DEFAULT_SETTINGS.repeatEach, 1, MAX_REPEAT_EACH),
+    ),
+    repeatRange: Math.round(
+      numberOr(stored.repeatRange, DEFAULT_SETTINGS.repeatRange, 1, MAX_REPEAT_RANGE),
+    ),
+    memorizationMask:
+      stored.memorizationMask === 'firstWord' || stored.memorizationMask === 'hidden'
+        ? stored.memorizationMask
+        : DEFAULT_SETTINGS.memorizationMask,
   };
 }
 

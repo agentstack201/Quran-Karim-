@@ -28,7 +28,13 @@ export const DEFAULT_SETTINGS: Settings = {
   autoScroll: true,
   playbackRate: 1,
   volume: 1,
+  repeatEach: 1,
+  repeatRange: 1,
+  memorizationMask: 'none',
 };
+
+/** Repetition counts offered in the memorisation controls. */
+export const REPEAT_CHOICES = [1, 2, 3, 5, 7, 10] as const;
 
 /** Bounds for the Quranic text scale control. */
 export const QURAN_SCALE = {

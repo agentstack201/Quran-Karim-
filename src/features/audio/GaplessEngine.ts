@@ -59,6 +59,12 @@ export type EngineSnapshot = {
   readonly surah: number;
   readonly ayah: number;
   readonly queue: readonly number[];
+  /**
+   * Position within the queue, which a memorisation queue makes essential:
+   * once `[7,7,7]` is a legitimate queue, an ayah number no longer identifies
+   * where playback is, and searching the queue for it finds the wrong entry.
+   */
+  readonly index: number;
   readonly status: EngineStatus;
   readonly playing: boolean;
   readonly error: string | null;
@@ -134,6 +140,7 @@ export class GaplessEngine {
       surah: this.surah,
       ayah: this.cursor >= 0 ? (this.queue[this.cursor] ?? 0) : 0,
       queue: this.queue,
+      index: this.cursor,
       status: this.status,
       playing: this.playing,
       error: this.error,

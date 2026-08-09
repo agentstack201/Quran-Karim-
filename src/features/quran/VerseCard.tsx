@@ -1,12 +1,12 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { ROUTES, SITE_URL } from '@/constants';
 import { Icon, IconButton, useToast } from '@/components/ui';
 import { useAudio } from '@/features/audio/AudioProvider';
 import { useBookmarks } from '@/features/bookmarks/BookmarksProvider';
 import { useSettings } from '@/features/settings/SettingsProvider';
-import type { Verse } from '@/types';
+import type { MemorizationMask, Verse } from '@/types';
 import { canShare, cn, copyToClipboard, formatAyahForSharing, shareContent } from '@/utils';
 
 export type VerseCardProps = {
@@ -59,6 +59,33 @@ function VerseCardComponent({
 
   const bookmarked = isBookmarked(verse.key);
   const isCurrentTrack = track?.surah === verse.surah && track.ayah === verse.ayah;
+
+  /**
+   * Memorisation masking.
+   *
+   * Revealing is per-verse and deliberately not persisted: the point of the
+   * exercise is that the text is hidden again next time you meet it.
+   */
+  const [revealedFor, setRevealedFor] = useState<MemorizationMask | null>(null);
+  const revealed = revealedFor === settings.memorizationMask;
+  const masked = settings.memorizationMask !== 'none' && !revealed;
+
+  // Splitting on spaces is safe for Arabic: shaping joins letters within a word
+  // and never across a space, so each word renders exactly as it does inline.
+  const words = useMemo(
+    () => (settings.memorizationMask === 'none' ? [] : verse.text.split(' ')),
+    [verse.text, settings.memorizationMask],
+  );
+
+  // Recording *which* level was revealed, rather than a plain flag, means
+  // changing the level conceals the verse again — moving from "first word" to
+  // "hidden" is a harder round of the same exercise, not a continuation of the
+  // one already solved.
+  const toggleReveal = useCallback(() => {
+    setRevealedFor((current) =>
+      current === settings.memorizationMask ? null : settings.memorizationMask,
+    );
+  }, [settings.memorizationMask]);
 
   const onPlay = useCallback(() => {
     if (isCurrentTrack) {
@@ -144,8 +171,30 @@ function VerseCardComponent({
         // direction is ever overridden.
         dir="rtl"
         lang="ar"
+        // Touch reveal, duplicated by a real button in the action row below so
+        // the same thing is reachable from a keyboard and a screen reader.
+        onClick={masked ? toggleReveal : undefined}
       >
-        {verse.text}
+        {masked ? (
+          words.map((word, position) => (
+            <span
+              key={position}
+              // The first word stays legible at the `firstWord` level: it is the
+              // cue a memoriser recalls the rest of the ayah from, and hiding it
+              // turns practice into a blank stare.
+              className={
+                settings.memorizationMask === 'firstWord' && position === 0
+                  ? undefined
+                  : 'verse-masked'
+              }
+            >
+              {word}
+              {position < words.length - 1 ? ' ' : ''}
+            </span>
+          ))
+        ) : (
+          <>{verse.text}</>
+        )}
         <span className="ayah-medallion" aria-hidden="true">
           {verse.numberInSurah}
         </span>
@@ -198,6 +247,16 @@ function VerseCardComponent({
         />
         <IconButton icon="copy" label="نسخ الآية" onClick={onCopy} size="sm" />
         <IconButton icon="share" label="مشاركة الآية" onClick={onShare} size="sm" />
+
+        {settings.memorizationMask !== 'none' && (
+          <IconButton
+            icon={revealed ? 'eyeOff' : 'eye'}
+            label={revealed ? 'إخفاء الآية' : 'كشف الآية'}
+            onClick={toggleReveal}
+            size="sm"
+            active={revealed}
+          />
+        )}
 
         {verse.sajdah && (
           <span className="ms-auto flex items-center gap-1 rounded-xs bg-accent-soft px-2 py-1 text-[0.6875rem] font-semibold text-accent">

@@ -9,9 +9,16 @@ import {
   Switch,
   type SegmentOption,
 } from '@/components/ui';
-import { PLAYBACK_RATES, QURAN_LEADING, QURAN_SCALE, RECITERS, TAFSIR_EDITIONS } from '@/constants';
+import {
+  PLAYBACK_RATES,
+  QURAN_LEADING,
+  QURAN_SCALE,
+  RECITERS,
+  REPEAT_CHOICES,
+  TAFSIR_EDITIONS,
+} from '@/constants';
 import { BASMALAH } from '@/constants';
-import type { BackgroundChoice, ThemePreference } from '@/types';
+import type { BackgroundChoice, MemorizationMask, ThemePreference } from '@/types';
 import { toArabicNumerals } from '@/utils';
 import { useSettings } from './SettingsProvider';
 
@@ -19,6 +26,12 @@ const THEME_OPTIONS: readonly SegmentOption<ThemePreference>[] = [
   { value: 'light', label: 'نهاري', icon: 'sun' },
   { value: 'dark', label: 'ليلي', icon: 'moon' },
   { value: 'system', label: 'النظام', icon: 'monitor' },
+];
+
+const MASK_OPTIONS: readonly SegmentOption<MemorizationMask>[] = [
+  { value: 'none', label: 'ظاهر', icon: 'eye' },
+  { value: 'firstWord', label: 'أول كلمة', icon: 'textSize' },
+  { value: 'hidden', label: 'مخفي', icon: 'eyeOff' },
 ];
 
 const BACKGROUND_OPTIONS: readonly { value: BackgroundChoice; label: string; swatch: string }[] = [
@@ -226,6 +239,51 @@ export function SettingsPanel({
                 checked={settings.autoScroll}
                 onChange={(checked) => update('autoScroll', checked)}
               />
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="settings-memorization">
+          <h3 id="settings-memorization" className="mb-1.5 text-sm font-bold text-ink">
+            الحفظ
+          </h3>
+          <p className="mb-4 text-xs text-ink-subtle">
+            كرّر الآية حتى تستقر، وأخفِ النص تدريجياً حتى تستغني عنه.
+          </p>
+
+          <div className="space-y-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Select
+                label="تكرار كل آية"
+                value={String(settings.repeatEach)}
+                onChange={(value) => update('repeatEach', Number(value))}
+                options={REPEAT_CHOICES.map((count) => ({
+                  value: String(count),
+                  label: count === 1 ? 'بدون تكرار' : `${toArabicNumerals(count)} مرات`,
+                }))}
+              />
+              <Select
+                label="تكرار المقطع"
+                value={String(settings.repeatRange)}
+                onChange={(value) => update('repeatRange', Number(value))}
+                options={REPEAT_CHOICES.map((count) => ({
+                  value: String(count),
+                  label: count === 1 ? 'مرة واحدة' : `${toArabicNumerals(count)} مرات`,
+                }))}
+              />
+            </div>
+
+            <div>
+              <span className="mb-2 block text-sm font-medium text-ink">إخفاء النص</span>
+              <SegmentedControl
+                label="مستوى إخفاء النص"
+                options={MASK_OPTIONS}
+                value={settings.memorizationMask}
+                onChange={(value) => update('memorizationMask', value)}
+              />
+              <p className="mt-2 text-xs text-ink-subtle">
+                الكلمات المخفية تظهر كخطوط، والمسة عليها تكشف الآية.
+              </p>
             </div>
           </div>
         </section>

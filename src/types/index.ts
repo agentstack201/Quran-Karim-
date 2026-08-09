@@ -19,6 +19,7 @@ export type {
   BackgroundChoice,
   Bookmark,
   LastRead,
+  MemorizationMask,
   ReadingStats,
   ResolvedTheme,
   Settings,

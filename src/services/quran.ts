@@ -91,6 +91,30 @@ export function isValidPageId(id: number): boolean {
   return Number.isInteger(id) && id >= 1 && id <= 604;
 }
 
+/**
+ * Resolves the Mus'haf page a global verse id sits on.
+ *
+ * Binary search rather than a scan: this runs on every scroll tick that moves
+ * a khatmah's progress forward, and 604 comparisons per tick would be work for
+ * nothing when nine will do.
+ */
+export function getPageByVerseId(verseId: number): Page | null {
+  let low = 0;
+  let high = PAGE_LIST.length - 1;
+
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    const page = PAGE_LIST[middle];
+    if (!page) break;
+
+    if (verseId < page.firstVerseId) high = middle - 1;
+    else if (verseId > page.lastVerseId) low = middle + 1;
+    else return page;
+  }
+
+  return null;
+}
+
 /** Runtime shape check for a fetched surah payload. */
 function isChapterWithVerses(value: unknown): value is ChapterWithVerses {
   if (typeof value !== 'object' || value === null) return false;

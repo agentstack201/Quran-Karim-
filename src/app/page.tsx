@@ -5,6 +5,7 @@ import { Icon } from '@/components/ui';
 import { ContinueReading } from '@/features/home/ContinueReading';
 import { DailyVerse } from '@/features/home/DailyVerse';
 import { Hero } from '@/features/home/Hero';
+import { KhatmahCard } from '@/features/khatmah/KhatmahCard';
 import { StatsGrid } from '@/features/home/StatsGrid';
 import { ChapterCard } from '@/features/quran/ChapterCard';
 import { PartCard } from '@/features/quran/PartCard';
@@ -125,10 +126,13 @@ export default function HomePage(): React.JSX.Element {
       <div className="mx-auto max-w-6xl space-y-16 px-4 sm:px-6">
         <section aria-labelledby="home-continue">
           <h2 id="home-continue" className="sr-only">
-            متابعة القراءة وآية اليوم
+            وردك اليوم ومتابعة القراءة وآية اليوم
           </h2>
           <div className="grid gap-4 lg:grid-cols-[1fr_1.45fr]">
-            <ContinueReading />
+            <div className="flex flex-col gap-4">
+              <KhatmahCard />
+              <ContinueReading />
+            </div>
             <DailyVerse />
           </div>
         </section>

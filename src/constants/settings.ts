@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   bookmarks: 'tilawa:bookmarks',
   visitedSurahs: 'tilawa:visited-surahs',
   readingDays: 'tilawa:reading-days',
+  khatmah: 'tilawa:khatmah',
   installPromptDismissed: 'tilawa:install-dismissed',
 } as const;
 

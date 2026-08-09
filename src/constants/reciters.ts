@@ -135,6 +135,20 @@ export function getReciter(id: string): Reciter {
   return fallback;
 }
 
+/** Reciters keyed by archive folder — the only identifier a cached URL carries. */
+const RECITER_BY_FOLDER = new Map(RECITERS.map((reciter) => [reciter.folder, reciter]));
+
+/**
+ * Resolves a reciter from the folder segment of an audio URL.
+ *
+ * Returns `null` rather than falling back, because the caller is naming a voice
+ * that was actually downloaded: showing the default reciter's name over another
+ * reciter's files would be worse than showing the raw folder.
+ */
+export function getReciterByFolder(folder: string): Reciter | null {
+  return RECITER_BY_FOLDER.get(folder) ?? null;
+}
+
 /** Builds the audio URL for a single ayah. */
 export function buildAyahAudioUrl(reciter: Reciter, surah: number, ayah: number): string {
   const paddedSurah = String(surah).padStart(3, '0');

@@ -20,6 +20,7 @@ import {
 import { BASMALAH } from '@/constants';
 import type { BackgroundChoice, MemorizationMask, ThemePreference } from '@/types';
 import { toArabicNumerals } from '@/utils';
+import { StorageSection } from '@/features/downloads/StorageSection';
 import { useSettings } from './SettingsProvider';
 
 const THEME_OPTIONS: readonly SegmentOption<ThemePreference>[] = [
@@ -287,6 +288,8 @@ export function SettingsPanel({
             </div>
           </div>
         </section>
+
+        <StorageSection />
 
         <section aria-labelledby="settings-tafsir">
           <h3 id="settings-tafsir" className="mb-4 text-sm font-bold text-ink">

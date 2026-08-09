@@ -13,6 +13,7 @@ export {
 export {
   clamp,
   formatDate,
+  formatBytes,
   formatDuration,
   formatNumber,
   formatRelativeTime,

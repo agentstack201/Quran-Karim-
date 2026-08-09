@@ -25,6 +25,7 @@ export {
   RECITERS,
   buildAyahAudioUrl,
   getReciter,
+  getReciterByFolder,
 } from './reciters';
 
 export { DEFAULT_TAFSIR_ID, QURAN_API_BASE, TAFSIR_EDITIONS, getTafsirEdition } from './tafsirs';

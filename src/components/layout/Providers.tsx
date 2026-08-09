@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui';
 import { AudioProvider } from '@/features/audio/AudioProvider';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksProvider';
+import { DownloadsProvider } from '@/features/downloads/DownloadsProvider';
 import { SettingsProvider } from '@/features/settings/SettingsProvider';
 
 /**
@@ -13,15 +14,18 @@ import { SettingsProvider } from '@/features/settings/SettingsProvider';
  * every page's shell, metadata and static content — stays a Server Component.
  *
  * Order matters: settings must be available before audio (which reads the
- * chosen reciter, volume and playback rate), and toasts must wrap everything
- * that reports success or failure to the user.
+ * chosen reciter, volume and playback rate) and before downloads (which are
+ * stored per reciter), and toasts must wrap everything that reports success or
+ * failure to the user.
  */
 export function Providers({ children }: { readonly children: ReactNode }): React.JSX.Element {
   return (
     <ToastProvider>
       <SettingsProvider>
         <BookmarksProvider>
-          <AudioProvider>{children}</AudioProvider>
+          <DownloadsProvider>
+            <AudioProvider>{children}</AudioProvider>
+          </DownloadsProvider>
         </BookmarksProvider>
       </SettingsProvider>
     </ToastProvider>

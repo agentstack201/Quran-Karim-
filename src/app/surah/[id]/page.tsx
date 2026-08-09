@@ -4,6 +4,7 @@ import { ROUTES, SITE_URL, TOTAL_CHAPTERS } from '@/constants';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge, Icon } from '@/components/ui';
+import { DownloadButton } from '@/features/downloads/DownloadButton';
 import { ChapterNavigation } from '@/features/quran/ChapterNavigation';
 import { ReaderBoundary } from '@/features/quran/ReaderBoundary';
 import { CHAPTERS, getChapter } from '@/services/quran';
@@ -109,6 +110,10 @@ export default async function SurahPage({ params }: PageProps): Promise<React.JS
         <p className="mt-4 text-sm text-ink-subtle">
           {chapter.transliteration} · {chapter.translation}
         </p>
+        <div className="mt-5 flex justify-center">
+          <DownloadButton surah={chapter.id} />
+        </div>
+
         <div className="ornamental-rule mt-6" aria-hidden="true">
           <Icon name="star" size={15} />
         </div>

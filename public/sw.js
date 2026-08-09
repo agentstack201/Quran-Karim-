@@ -12,13 +12,15 @@
  *   surah data       cache-first, immutable (content never changes)
  *   fonts            cache-first, immutable
  *   API responses    stale-while-revalidate (tafsir, search)
- *   audio            passthrough — never cached
+ *   recitation audio cache-first, but never populated here
  *
- * Audio is deliberately excluded. Recitations are range-requested and a full
- * Mus'haf of them runs to gigabytes; caching them would silently consume a
- * user's storage quota and evict the verse data that actually makes the app
- * work offline.
+ * Audio is served from the cache when it is there and fetched from the network
+ * when it is not — and this worker never puts anything into that cache. Storing
+ * recitations implicitly is what would silently consume a reader's quota; every
+ * file in the audio cache got there because someone pressed download and
+ * watched it happen.
  *
+ * @see src/services/audio-cache.ts for the download side.
  * @see src/features/pwa/ServiceWorkerRegistrar.tsx for registration.
  */
 
@@ -26,7 +28,7 @@
  * Bump on every deploy that changes the precache list or a strategy.
  * Old caches are deleted on activate.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 
 const CACHES = {
   shell: `tilawa-shell-${VERSION}`,
@@ -34,6 +36,21 @@ const CACHES = {
   data: `tilawa-data-${VERSION}`,
   api: `tilawa-api-${VERSION}`,
 };
+
+/**
+ * Downloaded recitations.
+ *
+ * Unversioned on purpose, and kept out of `CACHES` so the activate sweep cannot
+ * reach it. Everything else here is build output that a deploy may safely throw
+ * away; this holds hundreds of megabytes a reader chose to download and waited
+ * for, and discarding it because the app shipped a new stylesheet would destroy
+ * the one thing they downloaded it for. Its contents are immutable audio files,
+ * so no release can invalidate them.
+ */
+const AUDIO_CACHE = 'tilawa-audio';
+
+/** Matches `.../{reciter folder}/{surah}{ayah}.mp3` in the recitation archive. */
+const AUDIO_URL_PATTERN = /\/[^/]+\/\d{6}\.mp3$/;
 
 const OFFLINE_URL = '/offline';
 
@@ -136,6 +153,24 @@ async function staleWhileRevalidate(request, cacheName) {
 }
 
 /**
+ * Serves a recitation from the reader's downloads, falling back to the network.
+ *
+ * A cache miss must stay a plain network request rather than becoming an error:
+ * an ayah the reader never downloaded should still play when they are online,
+ * exactly as it did before downloads existed.
+ */
+async function audioFromDownloads(request) {
+  try {
+    const cache = await caches.open(AUDIO_CACHE);
+    const cached = await cache.match(request.url, { ignoreVary: true });
+    if (cached) return cached;
+  } catch {
+    // Storage unavailable; the network is still a perfectly good answer.
+  }
+  return fetch(request);
+}
+
+/**
  * Network-first for navigations, so a reader online always gets the current
  * page, while an offline reader still gets whatever was cached — and the
  * offline page as a last resort.
@@ -194,7 +229,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      const known = new Set(Object.values(CACHES));
+      const known = new Set([...Object.values(CACHES), AUDIO_CACHE]);
       const names = await caches.keys();
 
       await Promise.all(
@@ -233,9 +268,12 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) {
-    // Audio lives on a third-party CDN and uses range requests; passing it
-    // through untouched keeps seeking working and keeps gigabytes of
-    // recitation out of the cache.
+    // Recitation audio: answer from the download cache when the reader has
+    // this ayah, otherwise let it reach the network untouched. Nothing is
+    // stored here — see the note on AUDIO_CACHE.
+    if (AUDIO_URL_PATTERN.test(url.pathname)) {
+      event.respondWith(audioFromDownloads(request));
+    }
     return;
   }
 

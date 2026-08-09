@@ -25,6 +25,7 @@ export const ROUTES = {
   page: (id: number): string => `/page/${id}`,
   search: '/search',
   searchQuery: (query: string): string => `/search?q=${encodeURIComponent(query)}`,
+  hifz: '/hifz',
   bookmarks: '/bookmarks',
   about: '/about',
   offline: '/offline',
@@ -51,5 +52,6 @@ export const NAV_ITEMS = [
   { href: ROUTES.juzIndex, label: 'الأجزاء', icon: 'layers' },
   { href: ROUTES.hizbIndex, label: 'الأحزاب', icon: 'grid' },
   { href: ROUTES.pageIndex, label: 'الصفحات', icon: 'page' },
+  { href: ROUTES.hifz, label: 'الحفظ', icon: 'sparkle' },
   { href: ROUTES.bookmarks, label: 'المحفوظات', icon: 'bookmark' },
 ] as const;

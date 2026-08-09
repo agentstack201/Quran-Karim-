@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A memorisation engine.** The application can now tell a ḥāfiẓ what to
+  review today and where their ḥifẓ is slipping — the two questions a reader
+  actually has, neither of which a Mus'haf reader can answer.
+  - Scheduling is FSRS-shaped (retrievability, stability, difficulty) rather
+    than SM-2, with three additions ḥifẓ needs and general flashcards do not:
+    reviewing a page reinforces its neighbours, page-to-page **joins** are
+    review items in their own right, and a stability discount is reserved for
+    passages with untrained lookalikes.
+  - The daily session is filled to a budget the reader sets, highest priority
+    first. The backlog is reported but never used as the headline — "47 pages
+    due" is true, useless, and the most reliable way to make someone stop.
+  - New memorisation **suspends itself** when review debt gets high, and says
+    why. Every teacher of ḥifẓ gives this advice; almost no app enforces it,
+    because "new page memorised" feels like progress.
+  - A range seeder, so someone arriving with fifteen juzʾ memorised is not
+    asked to tap through three hundred pages. It records a declaration at a
+    deliberately conservative stability, not a review.
+- **A memorisation heatmap**: all 604 pages on one screen, shaded by how well
+  each is currently held. It costs no model, no server and no new data — it
+  renders numbers the scheduler already keeps — and it turns an unbounded worry
+  into a finite list. Paired with a weakest-pages list that does the
+  navigating, because a 12px cell is a picture, not a control.
+- `utils/day`, shared calendar-day arithmetic, extracted from the khatmah plan
+  now that two features reason in days.
+
 ### Changed
 
 - **The application no longer has a server.** It builds to a static export —

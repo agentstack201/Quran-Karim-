@@ -47,6 +47,10 @@ const ROUTES = [
   '/hizb/1',
   '/search',
   '/bookmarks',
+  // The ḥifẓ dashboard renders its empty state here, since the audit runs with
+  // a clean profile. The populated state — heatmap, session rows — is covered
+  // by the seeded pass below.
+  '/hifz',
   '/about',
   '/offline',
   // An id outside 1–114, to reach the not-found page.
@@ -152,6 +156,42 @@ async function main() {
   for (const appearance of APPEARANCES) {
     const page = await openWithAppearance(context, '/surah/2', appearance.settings);
     await audit(page, appearance.label);
+    await page.close();
+  }
+
+  /*
+   * The ḥifẓ dashboard is the one screen whose interesting state does not
+   * exist until a reader has a history. Auditing only its empty state would
+   * check a paragraph and miss the 604-cell heatmap, the legend and the review
+   * rows — which is to say, all of it.
+   */
+  console.log('\nMemorisation (populated)');
+  {
+    const page = await openWithAppearance(context, '/hifz', APPEARANCES[0].settings);
+
+    await page.getByRole('button', { name: /أضف ما تحفظه/ }).click();
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: /^أضف .* صفحة$/ }).click();
+    await page.waitForTimeout(600);
+    await forceLayout(page);
+    await audit(page, 'hifz dashboard with a seeded juz');
+
+    // Age every review so the session fills with due work and renders its rows.
+    await page.evaluate(() => {
+      const stored = JSON.parse(localStorage.getItem('tilawa:memorization'));
+      stored.units = stored.units.map((unit) => [
+        ...unit.slice(0, 5),
+        '2025-01-01',
+        ...unit.slice(6),
+      ]);
+      localStorage.setItem('tilawa:memorization', JSON.stringify(stored));
+    });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
+    await forceLayout(page);
+    await audit(page, 'hifz dashboard with due reviews');
+
+    await page.evaluate(() => localStorage.removeItem('tilawa:memorization'));
     await page.close();
   }
 

@@ -10,6 +10,9 @@ export const STORAGE_KEYS = {
   visitedSurahs: 'tilawa:visited-surahs',
   readingDays: 'tilawa:reading-days',
   khatmah: 'tilawa:khatmah',
+  /** The ḥifẓ unit history — see `features/memorization/model.ts` for its shape. */
+  memorization: 'tilawa:memorization',
+  memorizationSettings: 'tilawa:memorization-settings',
   installPromptDismissed: 'tilawa:install-dismissed',
 } as const;
 

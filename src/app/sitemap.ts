@@ -45,6 +45,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    /*
+     * الحفظ صفحة عامة رغم أن محتواها شخصي: القشرة نفسها تشرح الميزة، وسجلّ
+     * القارئ لا يظهر في HTML أصلاً لأنه على جهازه. هذا يفصلها عن `/bookmarks`
+     * المستثناة — تلك قائمة لا صفحة.
+     */
+    { url: `${SITE_URL}${ROUTES.hifz}`, lastModified, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE_URL}${ROUTES.about}`, lastModified, changeFrequency: 'yearly', priority: 0.4 },
   ];
 

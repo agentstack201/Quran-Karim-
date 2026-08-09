@@ -1,4 +1,5 @@
 import { TOTAL_PAGES } from '@/constants';
+import { dayKey, daysBetween } from '@/utils';
 
 /**
  * Khatmah planning.
@@ -53,21 +54,12 @@ export type DailyPortion = {
   readonly overdue: boolean;
 };
 
-/** Local date key. Local, not UTC: a reader's day ends at their midnight. */
-export function dayKey(date: Date = new Date()): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/** Whole days from one date key to another, by calendar day rather than hours. */
-export function daysBetween(from: string, to: string): number {
-  const start = new Date(`${from}T00:00:00`).getTime();
-  const end = new Date(`${to}T00:00:00`).getTime();
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return 0;
-  return Math.round((end - start) / 86_400_000);
-}
+/**
+ * Day arithmetic now lives in `@/utils/day`, shared with the memorisation
+ * engine. Re-exported here because a khatmah plan is expressed in days and
+ * callers of this module reasonably expect to find them alongside it.
+ */
+export { dayKey, daysBetween };
 
 /** Creates a plan starting today. */
 export function createPlan(days: number, today: string = dayKey()): KhatmahPlan {

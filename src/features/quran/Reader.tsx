@@ -8,7 +8,7 @@ import { useAudio } from '@/features/audio/AudioProvider';
 import { useBookmarks } from '@/features/bookmarks/BookmarksProvider';
 import { useSettings } from '@/features/settings/SettingsProvider';
 import { useKeyboardShortcuts, scrollIntoView } from '@/hooks';
-import { fetchChapter, fetchHizbRange, fetchJuzRange } from '@/services/quran';
+import { fetchChapter, fetchHizbRange, fetchJuzRange, fetchPageRange } from '@/services/quran';
 import type { AsyncStatus, ReadingMode, Verse } from '@/types';
 import { TafsirDialog } from './TafsirDialog';
 import { VerseCard } from './VerseCard';
@@ -96,7 +96,9 @@ export function Reader({
           ? await fetchChapter(id, controller.signal)
           : mode === 'juz'
             ? await fetchJuzRange(id, controller.signal)
-            : await fetchHizbRange(id, controller.signal);
+            : mode === 'page'
+              ? await fetchPageRange(id, controller.signal)
+              : await fetchHizbRange(id, controller.signal);
 
       if (controller.signal.aborted) return;
 

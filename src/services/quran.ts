@@ -1,12 +1,14 @@
 import chaptersData from '@/data/chapters.json';
 import hizbData from '@/data/hizb.json';
 import juzData from '@/data/juz.json';
+import pagesData from '@/data/pages.json';
 import { API_ROUTES } from '@/constants';
 import type {
   Chapter,
   ChapterWithVerses,
   Hizb,
   Juz,
+  Page,
   Result,
   Verse,
   VerseRange,
@@ -34,9 +36,13 @@ import type {
 export const CHAPTERS = chaptersData as readonly Chapter[];
 export const JUZ_LIST = juzData as readonly Juz[];
 export const HIZB_LIST = hizbData as readonly Hizb[];
+export const PAGE_LIST = pagesData as readonly Page[];
 
 /** Lookup by surah number, built once at module load. */
 const CHAPTER_BY_ID = new Map<number, Chapter>(CHAPTERS.map((chapter) => [chapter.id, chapter]));
+
+/** Pages are addressed by number far more often than the parts are. */
+const PAGE_BY_ID = new Map<number, Page>(PAGE_LIST.map((page) => [page.id, page]));
 
 /** In-flight and completed surah requests, so a surah is fetched at most once. */
 const surahCache = new Map<number, Promise<Result<ChapterWithVerses>>>();
@@ -75,6 +81,14 @@ export function isValidJuzId(id: number): boolean {
 
 export function isValidHizbId(id: number): boolean {
   return Number.isInteger(id) && id >= 1 && id <= 60;
+}
+
+export function getPage(id: number): Page | null {
+  return PAGE_BY_ID.get(id) ?? null;
+}
+
+export function isValidPageId(id: number): boolean {
+  return Number.isInteger(id) && id >= 1 && id <= 604;
 }
 
 /** Runtime shape check for a fetched surah payload. */
@@ -266,6 +280,60 @@ export async function fetchHizbRange(
       verses,
       firstVerseId: hizb.firstVerseId,
       lastVerseId: hizb.lastVerseId,
+    },
+  };
+}
+
+/**
+ * Loads one Mus'haf page as a reading range.
+ *
+ * Served from the juz payloads for the same reason a hizb is: the page index
+ * holds only boundaries, so nothing here duplicates the Mus'haf on disk. Four
+ * of the 604 pages straddle a juz boundary and need both payloads; the rest are
+ * a single request, and both are already memoised.
+ */
+export async function fetchPageRange(
+  id: number,
+  signal?: AbortSignal,
+): Promise<Result<VerseRange>> {
+  const page = getPage(id);
+  if (!page) return { ok: false, error: 'رقم الصفحة غير صحيح' };
+
+  const payloads = await Promise.all(page.juz.map((juz) => fetchJuzVerses(juz, signal)));
+
+  const failure = payloads.find((payload) => !payload.ok);
+  if (failure && !failure.ok) return failure;
+
+  const seen = new Set<number>();
+  const verses: Verse[] = [];
+
+  for (const payload of payloads) {
+    if (!payload.ok) continue;
+    for (const verse of payload.data) {
+      if (verse.id < page.firstVerseId || verse.id > page.lastVerseId) continue;
+      // A verse on a juz boundary appears in both payloads.
+      if (seen.has(verse.id)) continue;
+      seen.add(verse.id);
+      verses.push(verse);
+    }
+  }
+
+  if (verses.length === 0) {
+    return { ok: false, error: 'لا توجد آيات في هذه الصفحة' };
+  }
+
+  verses.sort((a, b) => a.id - b.id);
+
+  return {
+    ok: true,
+    data: {
+      mode: 'page',
+      id: page.id,
+      title: `صفحة ${page.id}`,
+      subtitle: describeRange(page.start, page.end, page.versesCount),
+      verses,
+      firstVerseId: page.firstVerseId,
+      lastVerseId: page.lastVerseId,
     },
   };
 }

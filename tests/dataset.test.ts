@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { TOTAL_CHAPTERS, TOTAL_HIZB, TOTAL_JUZ, TOTAL_VERSES } from '@/constants';
+import { TOTAL_CHAPTERS, TOTAL_HIZB, TOTAL_JUZ, TOTAL_PAGES, TOTAL_VERSES } from '@/constants';
 import {
   CHAPTERS,
   HIZB_LIST,
   JUZ_LIST,
+  PAGE_LIST,
   getChapterByVerseId,
   getDailyVerseId,
+  getPage,
 } from '@/services/quran';
 
 /**
@@ -209,5 +211,91 @@ describe('generated juz payloads', () => {
       expect(payload.verses[0]?.id).toBe(juz.firstVerseId);
       expect(payload.verses.at(-1)?.id).toBe(juz.lastVerseId);
     }
+  });
+});
+
+describe('pages', () => {
+  it('contains all 604 pages of the Madani Mus’haf in order', () => {
+    expect(PAGE_LIST).toHaveLength(TOTAL_PAGES);
+    PAGE_LIST.forEach((page, index) => {
+      expect(page.id).toBe(index + 1);
+    });
+  });
+
+  /**
+   * Pages partition the Mus'haf: every verse sits on exactly one, with no gap
+   * and no overlap. A single off-by-one here would silently drop an ayah from
+   * the reader, which is the one failure this project cannot ship.
+   */
+  it('partitions all 6236 verses with no gap or overlap', () => {
+    let expectedFirst = 1;
+    let covered = 0;
+
+    for (const page of PAGE_LIST) {
+      expect(page.firstVerseId).toBe(expectedFirst);
+      expect(page.lastVerseId).toBe(expectedFirst + page.versesCount - 1);
+      expectedFirst = page.lastVerseId + 1;
+      covered += page.versesCount;
+    }
+
+    expect(covered).toBe(TOTAL_VERSES);
+    expect(PAGE_LIST[TOTAL_PAGES - 1]?.lastVerseId).toBe(TOTAL_VERSES);
+  });
+
+  it('agrees with each surah’s recorded page span', () => {
+    for (const chapter of CHAPTERS) {
+      const opening = PAGE_LIST.find(
+        (page) =>
+          page.firstVerseId <= chapter.firstVerseId && page.lastVerseId >= chapter.firstVerseId,
+      );
+      const closing = PAGE_LIST.find(
+        (page) =>
+          page.firstVerseId <= chapter.lastVerseId && page.lastVerseId >= chapter.lastVerseId,
+      );
+
+      expect(opening?.id, `surah ${chapter.id} opening page`).toBe(chapter.startPage);
+      expect(closing?.id, `surah ${chapter.id} closing page`).toBe(chapter.endPage);
+    }
+  });
+
+  it('lists every surah that actually appears on the page', () => {
+    for (const page of PAGE_LIST) {
+      expect(page.surahs.length).toBeGreaterThan(0);
+      expect(page.surahs[0]).toBe(page.start.surah);
+      expect(page.surahs[page.surahs.length - 1]).toBe(page.end.surah);
+
+      // Recorded in reading order, never repeated.
+      expect([...page.surahs].sort((a, b) => a - b)).toEqual([...page.surahs]);
+      expect(new Set(page.surahs).size).toBe(page.surahs.length);
+    }
+  });
+
+  /**
+   * A page is read by filtering the juz payload it lives in, so the payloads it
+   * names have to be the ones that actually hold its verses — otherwise the
+   * page renders short, and only for the four pages that straddle a boundary.
+   */
+  it('names every juz payload needed to assemble the page', () => {
+    for (const page of PAGE_LIST) {
+      expect(page.juz.length).toBeGreaterThan(0);
+
+      const spanned = JUZ_LIST.filter(
+        (juz) => juz.firstVerseId <= page.lastVerseId && juz.lastVerseId >= page.firstVerseId,
+      ).map((juz) => juz.id);
+
+      expect(page.juz, `page ${page.id}`).toEqual(spanned);
+    }
+  });
+
+  it('resolves a page by number and rejects one outside the Mus’haf', () => {
+    expect(getPage(1)?.firstVerseId).toBe(1);
+    expect(getPage(TOTAL_PAGES)?.lastVerseId).toBe(TOTAL_VERSES);
+    expect(getPage(0)).toBeNull();
+    expect(getPage(TOTAL_PAGES + 1)).toBeNull();
+  });
+
+  it('opens on Al-Fatihah and closes on An-Nas', () => {
+    expect(PAGE_LIST[0]?.start).toEqual({ surah: 1, ayah: 1 });
+    expect(PAGE_LIST[TOTAL_PAGES - 1]?.end).toEqual({ surah: 114, ayah: 6 });
   });
 });

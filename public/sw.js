@@ -69,6 +69,7 @@ const PRECACHE_URLS = [
   '/surah',
   '/juz',
   '/hizb',
+  '/page',
   // Bookmarks and settings live entirely in LocalStorage, so this page works
   // perfectly with no network — but only if the shell itself is cached. It was
   // not, and an offline reader reaching for their saved ayat got the offline

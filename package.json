@@ -2,10 +2,10 @@
   "name": "tilawa",
   "version": "1.0.0",
   "private": true,
-  "description": "تلاوة — مصحف رقمي أنيق للقراءة والاستماع والتدبر. An elegant, offline-first Quran Progressive Web App.",
+  "description": "\u062a\u0644\u0627\u0648\u0629 \u2014 \u0645\u0635\u062d\u0641 \u0631\u0642\u0645\u064a \u0623\u0646\u064a\u0642 \u0644\u0644\u0642\u0631\u0627\u0621\u0629 \u0648\u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0627\u0644\u062a\u062f\u0628\u0631. An elegant, offline-first Quran Progressive Web App.",
   "keywords": [
     "quran",
-    "قرآن",
+    "\u0642\u0631\u0622\u0646",
     "mushaf",
     "tafsir",
     "tilawa",
@@ -32,6 +32,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "data:generate": "node scripts/generate-quran-data.mjs",
+    "data:pages": "node scripts/generate-pages.mjs",
     "fonts:fetch": "node scripts/fetch-fonts.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"

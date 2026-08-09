@@ -13,19 +13,19 @@ export function PartNavigation({
   id,
   max,
 }: {
-  readonly kind: 'juz' | 'hizb';
+  readonly kind: 'juz' | 'hizb' | 'page';
   readonly id: number;
   readonly max: number;
 }): React.JSX.Element {
-  const label = kind === 'juz' ? 'الجزء' : 'الحزب';
-  const buildHref = kind === 'juz' ? ROUTES.juz : ROUTES.hizb;
+  const label = kind === 'juz' ? 'الجزء' : kind === 'page' ? 'الصفحة' : 'الحزب';
+  const buildHref = kind === 'juz' ? ROUTES.juz : kind === 'page' ? ROUTES.page : ROUTES.hizb;
 
   const previous = id > 1 ? id - 1 : null;
   const next = id < max ? id + 1 : null;
 
   return (
     <nav
-      aria-label={`التنقّل بين ${kind === 'juz' ? 'الأجزاء' : 'الأحزاب'}`}
+      aria-label={`التنقّل بين ${kind === 'juz' ? 'الأجزاء' : kind === 'page' ? 'الصفحات' : 'الأحزاب'}`}
       className="mt-4 flex items-stretch gap-3 border-t border-border pt-8"
     >
       {previous !== null ? (
@@ -40,7 +40,9 @@ export function PartNavigation({
             className="text-ink-subtle transition-colors group-hover:text-primary"
           />
           <span className="text-start">
-            <span className="block text-[0.6875rem] text-ink-subtle">{label} السابق</span>
+            <span className="block text-[0.6875rem] text-ink-subtle">
+              {label} {kind === 'page' ? 'السابقة' : 'السابق'}
+            </span>
             <span className="block text-lg font-bold text-ink">
               {label} {previous}
             </span>
@@ -57,7 +59,9 @@ export function PartNavigation({
           className="group flex flex-1 items-center justify-end gap-3 rounded-lg border border-border bg-surface p-4 transition-colors duration-200 hover:border-border-strong"
         >
           <span className="text-end">
-            <span className="block text-[0.6875rem] text-ink-subtle">{label} التالي</span>
+            <span className="block text-[0.6875rem] text-ink-subtle">
+              {label} {kind === 'page' ? 'التالية' : 'التالي'}
+            </span>
             <span className="block text-lg font-bold text-ink">
               {label} {next}
             </span>

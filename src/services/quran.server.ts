@@ -3,7 +3,7 @@ import 'server-only';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Verse } from '@/types';
-import { getHizb, getJuz } from './quran';
+import { getHizb, getJuz, getPage } from './quran';
 
 /**
  * Build-time verse loading.
@@ -71,8 +71,37 @@ export async function getInitialHizbVerses(id: number): Promise<readonly Verse[]
     .slice(0, INITIAL_VERSE_COUNT);
 }
 
+/**
+ * The opening verses of a Mus'haf page.
+ *
+ * A page is short enough that this is usually the whole page, which is the
+ * point: the first paint of a page route is complete rather than partial.
+ */
+export async function getInitialPageVerses(id: number): Promise<readonly Verse[]> {
+  const page = getPage(id);
+  if (!page) return [];
+
+  const seen = new Set<number>();
+  const verses: Verse[] = [];
+
+  // Four of the 604 pages straddle a juz boundary and need both payloads.
+  for (const juz of page.juz) {
+    const payload = await readPayload<{ verses: Verse[] }>('juz', `${juz}.json`);
+    if (!payload) continue;
+
+    for (const verse of payload.verses) {
+      if (verse.id < page.firstVerseId || verse.id > page.lastVerseId) continue;
+      if (seen.has(verse.id)) continue;
+      seen.add(verse.id);
+      verses.push(verse);
+    }
+  }
+
+  return verses.sort((a, b) => a.id - b.id).slice(0, INITIAL_VERSE_COUNT);
+}
+
 /** Total verses in a reading range, used to reserve scroll height. */
-export function getRangeVerseCount(mode: 'juz' | 'hizb', id: number): number {
-  const part = mode === 'juz' ? getJuz(id) : getHizb(id);
+export function getRangeVerseCount(mode: 'juz' | 'hizb' | 'page', id: number): number {
+  const part = mode === 'juz' ? getJuz(id) : mode === 'page' ? getPage(id) : getHizb(id);
   return part?.versesCount ?? 0;
 }

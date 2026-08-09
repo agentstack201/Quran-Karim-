@@ -101,8 +101,29 @@ export type Hizb = {
   readonly endPage: number;
 };
 
+/**
+ * One page of the standard Madani Mus'haf.
+ *
+ * Pages are how most memorisers actually think — "three pages today", not
+ * "verses 12 to 34" — and every verse already carries the page it sits on, so
+ * this index is a grouping of existing data rather than a new dataset.
+ */
+export type Page = {
+  /** 1–604. */
+  readonly id: number;
+  readonly firstVerseId: number;
+  readonly lastVerseId: number;
+  readonly versesCount: number;
+  readonly start: VerseRef;
+  readonly end: VerseRef;
+  /** Juz payloads this page can be read from; four pages straddle two. */
+  readonly juz: readonly number[];
+  /** Every surah appearing on the page, in order. */
+  readonly surahs: readonly number[];
+};
+
 /** How the user is navigating the Mus'haf. */
-export type ReadingMode = 'surah' | 'juz' | 'hizb';
+export type ReadingMode = 'surah' | 'juz' | 'hizb' | 'page';
 
 /** A contiguous span of verses presented as one reading unit. */
 export type VerseRange = {

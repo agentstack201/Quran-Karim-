@@ -3,6 +3,7 @@ export type {
   ChapterWithVerses,
   Hizb,
   Juz,
+  Page,
   ReadingMode,
   Reciter,
   RevelationPlace,

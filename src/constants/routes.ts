@@ -21,6 +21,8 @@ export const ROUTES = {
   juz: (id: number): string => `/juz/${id}`,
   hizbIndex: '/hizb',
   hizb: (id: number): string => `/hizb/${id}`,
+  pageIndex: '/page',
+  page: (id: number): string => `/page/${id}`,
   search: '/search',
   searchQuery: (query: string): string => `/search?q=${encodeURIComponent(query)}`,
   bookmarks: '/bookmarks',
@@ -43,5 +45,6 @@ export const NAV_ITEMS = [
   { href: ROUTES.surahIndex, label: 'السور', icon: 'book' },
   { href: ROUTES.juzIndex, label: 'الأجزاء', icon: 'layers' },
   { href: ROUTES.hizbIndex, label: 'الأحزاب', icon: 'grid' },
+  { href: ROUTES.pageIndex, label: 'الصفحات', icon: 'page' },
   { href: ROUTES.bookmarks, label: 'المحفوظات', icon: 'bookmark' },
 ] as const;

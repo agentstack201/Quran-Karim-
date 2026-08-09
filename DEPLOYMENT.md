@@ -1,61 +1,172 @@
 # دليل النشر · Deployment
 
-كل ما تحتاجه لنقل **تلاوة** من المستودع إلى رابط يعمل.
+كل ما تحتاجه لنقل **تلاوة** من المستودع إلى رابط يعمل — **بتكلفة صفر**.
 
 ---
 
-## قبل النشر: ما تحتاج تجهيزه
+## لماذا هذا التطبيق مجاني الاستضافة فعلاً
 
-| #   | الخطوة                          | لماذا                                                                                                                           |
-| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| ١   | **اختر نطاقاً (domain)**        | العناوين في `sitemap.xml` و Open Graph و JSON-LD تُبنى منه. بدونه ستشير إلى النطاق الافتراضي، وتفهرس محركات البحث المضيف الخطأ. |
-| ٢   | **اضبط `NEXT_PUBLIC_SITE_URL`** | متغيّر البيئة الوحيد في المشروع. بلا شرطة مائلة في النهاية.                                                                     |
-| ٣   | **تحقّق من HTTPS**              | عامل الخدمة والتثبيت كتطبيق (PWA) لا يعملان إلا على HTTPS — عدا `localhost`.                                                    |
+التطبيق **تصدير ثابت بالكامل** (`output: 'export'`). لا خادم، ولا قاعدة بيانات،
+ولا دوال سحابية، ولا أي شيء يعمل بعد انتهاء البناء:
 
-> التطبيق يعمل بلا أي متغيّر بيئة. `NEXT_PUBLIC_SITE_URL` يؤثّر على SEO والمشاركة فقط، لا على القراءة.
+| ما يفعله القارئ            | أين يُنفَّذ                       | تكلفة الخادم |
+| -------------------------- | --------------------------------- | ------------ |
+| يقرأ سورة أو جزءاً أو صفحة | ملف HTML مُولَّد مسبقاً           | صفر          |
+| يبحث في المصحف             | فهرس في المتصفح (`/data/search/`) | **صفر**      |
+| يستمع لتلاوة               | أرشيف الصوت مباشرة                | صفر          |
+| يفتح التفسير               | `api.quran.com` مباشرة من المتصفح | صفر          |
+| يحفظ إشارة أو يتابع خطته   | `LocalStorage` على جهازه          | صفر          |
+
+الناتج **٥٬٠٩٩ ملفاً** (٨١٩ صفحة HTML مُولَّدة مسبقاً + البيانات)، وأكبر ملف
+٢ ميجابايت. هذا يقع داخل الطبقة المجانية لكل مستضيف ثابت تقريباً — وهو قرار
+معماري مقصود، لا مصادفة: كل ميزة تُضاف تُقاس بهذا المعيار.
+
+> **قاعدة المشروع:** أي ميزة تحتاج خادماً تحتاج جواباً عن سؤالين — من يدفع
+> فاتورته، وماذا يحدث للقارئ يوم لا يوجد من يدفع.
 
 ---
 
-## الخيار الأول: Vercel (الأسرع)
+## قبل النشر
 
-Next.js من صنع Vercel، فالنشر عليه لا يحتاج تهيئة.
+| #   | الخطوة                          | لماذا                                                                                           |
+| --- | ------------------------------- | ----------------------------------------------------------------------------------------------- |
+| ١   | **نطاق (domain)** — اختياري     | العناوين في `sitemap.xml` و Open Graph تُبنى منه. النطاق المجاني الذي يعطيك إياه المستضيف يكفي. |
+| ٢   | **اضبط `NEXT_PUBLIC_SITE_URL`** | متغيّر البيئة الوحيد. بلا شرطة مائلة في النهاية.                                                |
+| ٣   | **HTTPS**                       | عامل الخدمة والتثبيت كتطبيق لا يعملان بدونه. كل الخيارات أدناه توفّره مجاناً.                   |
+
+> التطبيق يعمل بلا أي متغيّر بيئة. `NEXT_PUBLIC_SITE_URL` يؤثّر على SEO
+> والمشاركة فقط، لا على القراءة.
+
+البناء:
 
 ```bash
-npm i -g vercel
-vercel login
-vercel --prod
-```
-
-أو من الواجهة: اربط المستودع من [vercel.com/new](https://vercel.com/new) — يكتشف Next.js تلقائياً.
-
-**أضف متغيّر البيئة** في Project Settings ← Environment Variables:
-
-```
-NEXT_PUBLIC_SITE_URL = https://your-domain.com
-```
-
-ثم أعد النشر ليأخذ المتغيّر مفعوله.
-
----
-
-## الخيار الثاني: خادم خاص (VPS)
-
-```bash
-git clone <repository-url> && cd tilawa
 npm ci
 NEXT_PUBLIC_SITE_URL=https://your-domain.com npm run build
-NEXT_PUBLIC_SITE_URL=https://your-domain.com npm start   # يستمع على 3000
+# الناتج كاملاً في out/
 ```
 
-للتشغيل الدائم مع PM2:
+---
+
+## الخيار الأول: Cloudflare Pages ✅ الموصى به
+
+**لماذا هو الأفضل لهذا المشروع تحديداً:** الطبقة المجانية بلا سقف على نقل
+البيانات (bandwidth). هذا يهمّ هنا أكثر من أي مشروع آخر — تطبيق قرآن ينقل
+ملفات JSON وصوتاً، ونجاحه يعني نقل بيانات أكثر. مستضيف يحاسبك على النجاح
+هو مستضيف سيقتل المشروع يوم ينجح.
+
+| الحد               | القيمة      | وضعنا                 |
+| ------------------ | ----------- | --------------------- |
+| نقل البيانات       | **بلا حد**  | ✔                     |
+| عدد الملفات        | ٢٠٬٠٠٠      | نستعمل ٥٬٠٩٩ ✔        |
+| حجم الملف الواحد   | ٢٥ ميجابايت | أكبر ملف ٢ ميجابايت ✔ |
+| عمليات بناء شهرياً | ٥٠٠         | كافٍ جداً ✔           |
+
+### الإعداد
+
+من [dash.cloudflare.com](https://dash.cloudflare.com) ← **Workers & Pages** ←
+**Create** ← **Pages** ← **Connect to Git**، ثم:
+
+| الحقل                  | القيمة                              |
+| ---------------------- | ----------------------------------- |
+| Framework preset       | `Next.js (Static HTML Export)`      |
+| Build command          | `npm run build`                     |
+| Build output directory | `out`                               |
+| Environment variable   | `NEXT_PUBLIC_SITE_URL` = رابط موقعك |
+
+أو من الطرفية:
 
 ```bash
-npm i -g pm2
-NEXT_PUBLIC_SITE_URL=https://your-domain.com pm2 start npm --name tilawa -- start
-pm2 save && pm2 startup
+npm i -g wrangler
+wrangler pages deploy out --project-name tilawa
 ```
 
-### Nginx أمام التطبيق
+**رؤوس الأمان تعمل تلقائياً**: ملف `public/_headers` يُنسخ إلى `out/` ويقرؤه
+Cloudflare مباشرة.
+
+---
+
+## الخيار الثاني: Netlify
+
+طبقة مجانية بـ **١٠٠ جيجابايت نقل بيانات شهرياً**. كافية للبداية، لكنها سقف
+حقيقي يمكن بلوغه.
+
+```toml
+# netlify.toml
+[build]
+  command = "npm run build"
+  publish = "out"
+```
+
+يقرأ `_headers` بنفس الصيغة، فرؤوس الأمان تعمل كما هي.
+
+---
+
+## الخيار الثالث: GitHub Pages
+
+مجاني تماماً، لكن **بتحفّظ مهم**.
+
+> ⚠️ **GitHub Pages لا يدعم رؤوس HTTP مخصّصة إطلاقاً.** يعني أن
+> `Content-Security-Policy` و`Strict-Transport-Security` و`X-Frame-Options`
+> **لن تُرسل**. الموقع يعمل، لكنه يفقد طبقة الحماية التي بُنيت له.
+>
+> إن نشرت هنا، فاعلم أنك تتنازل عن ذلك عن قصد. Cloudflare Pages مجاني بنفس
+> القدر ويحتفظ بالرؤوس — لا سبب وجيه لاختيار Pages على حسابها.
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://<user>.github.io/<repo>
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+> إن نشرت على مسار فرعي (`<user>.github.io/<repo>`) فستحتاج ضبط `basePath`
+> في `next.config.ts` — وإلا كُسرت كل الروابط والأصول. النشر على نطاق جذر
+> (نطاق مخصّص أو `<user>.github.io`) يتجنّب هذا كلياً، وهو الأبسط.
+
+---
+
+## أي خادم ثابت آخر
+
+`out/` مجلّد ملفات عادية. انسخه وحسب:
+
+```bash
+rsync -av --delete out/ user@host:/var/www/tilawa/
+```
+
+نموذج Nginx:
 
 ```nginx
 server {
@@ -65,137 +176,72 @@ server {
   ssl_certificate     /etc/letsencrypt/live/your-domain.com/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
 
+  root /var/www/tilawa;
+
+  # التصدير الثابت يكتب /surah/1.html — يجب أن يخدمه على /surah/1
   location / {
-    proxy_pass         http://127.0.0.1:3000;
-    proxy_http_version 1.1;
-    proxy_set_header   Upgrade $http_upgrade;
-    proxy_set_header   Connection 'upgrade';
-    proxy_set_header   Host $host;
-    proxy_set_header   X-Real-IP $remote_addr;
-    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header   X-Forwarded-Proto $scheme;
-    proxy_cache_bypass $http_upgrade;
+    try_files $uri $uri.html $uri/index.html /404.html;
+  }
+
+  # حمولات الآيات وفهرس البحث لا تتغيّر أبداً
+  location /data/  { expires 1y; add_header Cache-Control "public, immutable"; }
+  location /fonts/ { expires 1y; add_header Cache-Control "public, immutable"; }
+
+  # عامل الخدمة يجب ألا يُخزَّن — وإلا عَلِق القارئ على نسخة قديمة بلا مخرج
+  location = /sw.js {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Service-Worker-Allowed "/";
   }
 }
-
-server {
-  listen 80;
-  server_name your-domain.com;
-  return 301 https://$host$request_uri;
-}
 ```
 
-> **لا تُضِف رؤوس أمان في Nginx.** التطبيق يرسلها بنفسه من `next.config.ts`
-> (CSP، HSTS، X-Frame-Options وغيرها)، وتكرارها قد يُضعف السياسة بدل تقويتها.
-
-### Docker
-
-المشروع لا يحتاج `Dockerfile` خاصاً — قالب Next.js الرسمي يكفي:
-
-```dockerfile
-FROM node:22-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-ARG NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-RUN npm run build
-
-FROM node:22-alpine
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+> **رؤوس الأمان على خادم خاص:** انسخها من `public/_headers` — ذلك الملف
+> مُولَّد من `config/security-headers.mjs`، وهو مصدر الحقيقة الوحيد للسياسة.
+> لا تكتبها يدوياً في مكانين.
 
 ---
 
-## ماذا عن الاستضافة الساكنة (Netlify / GitHub Pages)؟
-
-**لا تعمل مباشرة.** المشروع يحتاج خادم Node لمسارين:
-
-- `/api/search` — فهرس البحث ٣ ميغابايت ويبقى على الخادم عمداً؛ إرساله للمتصفح يعني تحميله كاملاً عند كل زيارة
-- `/api/tafsir/[verseKey]` — يُنقّي HTML الوارد من مصدر خارجي قبل وصوله للمتصفح، وهو حاجز أمني لا يصح إسقاطه
-
-كل ما عدا ذلك ساكن بالفعل (٨٢٢ صفحة مُصيَّرة مسبقاً). على Netlify استخدم
-[`@netlify/plugin-nextjs`](https://docs.netlify.com/frameworks/next-js/overview/)
-الذي ينشر هذين المسارين كدوال.
-
----
-
-## بعد النشر: قائمة التحقق
-
-نفّذها على الرابط الحيّ — بعضها لا يمكن التحقق منه محلياً.
-
-### أساسيات
-
-- [ ] الصفحة الرئيسية تفتح، وآية اليوم تظهر خلال ثوانٍ
-- [ ] `/surah/1` تعرض الفاتحة كاملة بالرسم العثماني
-- [ ] البحث عن «الصلاة» يُرجع نتائج (يختبر تطبيع الرسم العثماني)
-- [ ] `/sitemap.xml` يعرض ٨١٤ رابطاً بنطاقك أنت لا بالنطاق الافتراضي
-- [ ] `/robots.txt` يشير إلى خريطة موقعك
-
-### ما لم يُختبر حيّاً بعد ⚠️
-
-هذان يعتمدان على خدمتين خارجيتين لم يكن الوصول إليهما ممكناً أثناء التطوير:
-
-- [ ] **التلاوة** — اضغط ▶ على أي آية. يجلب الصوت من `everyayah.com`
-- [ ] **التفسير** — افتح نافذة الآية. يجلب من `api.quran.com` عبر `/api/tafsir`
-
-إن فشل أحدهما، تحقّق أن `connect-src` و `media-src` في CSP داخل `next.config.ts`
-يسمحان بالنطاق المستخدم.
-
-### التثبيت كتطبيق (PWA)
-
-- [ ] **أندرويد / Chrome:** قائمة ← «تثبيت التطبيق»
-- [ ] **آيفون / Safari:** مشاركة ← «إضافة إلى الشاشة الرئيسية»
-- [ ] **ويندوز / ماك:** أيقونة التثبيت في شريط العنوان
-- [ ] بعد التثبيت: أغلق الإنترنت وافتح التطبيق — يجب أن تعمل الصفحة الرئيسية
-      وفهارس السور والأجزاء والأحزاب وصفحة المحفوظات، وكل سورة زرتها من قبل
-
-### قياس مستقل
-
-شغّل Lighthouse من DevTools على الرابط الحيّ. القيم المرجعية في
-[README](README.md#-الجودة--measured-quality) مقيسة على شبكة بطيئة عمداً؛
-النتائج على استضافة حقيقية ستكون أعلى.
-
----
-
-## التحديثات بعد النشر
+## بعد النشر: تحقّق من هذه الخمسة
 
 ```bash
-git pull
-npm ci
-npm run verify        # تنسيق ← lint ← أنواع ← اختبارات ← بناء
-npm start
+# ١. الرؤوس تصل فعلاً (فارغة على GitHub Pages — هذا متوقّع هناك)
+curl -sI https://your-domain.com | grep -i "content-security-policy\|strict-transport"
+
+# ٢. صفحة عميقة تُخدم بلا خطأ
+curl -s -o /dev/null -w "%{http_code}\n" https://your-domain.com/page/604
+
+# ٣. فهرس البحث في متناول المتصفح
+curl -s -o /dev/null -w "%{http_code} %{size_download}\n" https://your-domain.com/data/search/ar.json
+
+# ٤. عامل الخدمة لا يُخزَّن
+curl -sI https://your-domain.com/sw.js | grep -i cache-control
+
+# ٥. خريطة الموقع مبنية على نطاقك الصحيح
+curl -s https://your-domain.com/sitemap.xml | head -3
 ```
 
-### عند تعديل عامل الخدمة أو قائمة التخزين المسبق
+ثم يدوياً:
 
-ارفع `VERSION` في `public/sw.js`. المتصفحات تُبقي العامل القديم فعّالاً حتى
-تلاحظ تغيّراً في الملف، وترقيم الإصدار هو ما يحذف الذاكرات القديمة عند التفعيل.
-
-### عند تحديث بيانات المصحف
-
-```bash
-npm run data:generate
-npm test              # اختبارات سلامة البيانات هي شبكة الأمان هنا
-```
+- افتح الموقع، اقرأ سورة، ابحث عن آية.
+- **اقطع الإنترنت** وأعد التحميل — يجب أن يعمل كل ما زرته، **والبحث معه**
+  (الفهرس يُخزَّن عند أول بحث).
+- ثبّت التطبيق من شريط المتصفح وتأكّد أنه يفتح باسمه وأيقونته.
 
 ---
 
-## استكشاف الأعطال
+## التكلفة الشهرية المتوقّعة
 
-| العَرَض                           | السبب الأرجح                                                                                   |
-| --------------------------------- | ---------------------------------------------------------------------------------------------- |
-| العمل دون اتصال لا يعمل           | الموقع ليس على HTTPS، أو عامل الخدمة لم يُسجَّل. افتح DevTools ← Application ← Service Workers |
-| روابط المشاركة تحمل نطاقاً خاطئاً | `NEXT_PUBLIC_SITE_URL` غير مضبوط، أو ضُبط بعد البناء دون إعادة نشر                             |
-| التلاوة لا تعمل                   | `media-src` في CSP لا يسمح بنطاق الصوت، أو المصدر الخارجي معطّل                                |
-| التفسير يعرض «تعذّر جلب التفسير»  | `api.quran.com` غير متاح. الترجمة ومعلومات الآية تبقى ظاهرة — هذا تدهور مقصود لا عطل           |
-| صفحة بيضاء بعد التحديث            | عامل خدمة قديم يخدم قشرة قديمة. ارفع `VERSION` في `public/sw.js`                               |
-| البناء يفشل على المضيف            | تحقّق أن إصدار Node ‏`>= 20.9` — الملف `.nvmrc` يثبّت الإصدار ٢٢                               |
+| البند            | Cloudflare Pages                    |
+| ---------------- | ----------------------------------- |
+| الاستضافة والنقل | **٠ $**                             |
+| النطاق (اختياري) | ~١٠ $ سنوياً، أو ٠ $ بنطاق المستضيف |
+| **الإجمالي**     | **٠ $ / شهر**                       |
+
+هذا لا يتغيّر بعدد القرّاء. عشرة قرّاء أو مئة ألف — نفس الفاتورة، لأن لا شيء
+يعمل على خادم بينهم وبين المصحف.
+
+**البند الوحيد الذي يكبر مع النجاح هو الصوت**، وهو اليوم يُخدم من أرشيف
+`everyayah.com` لا من عندنا. إن استضفت الصوت بنفسك يوماً فاستعمل
+**Cloudflare R2** (خروج البيانات مجاني) لا S3 — الفرق بينهما آلاف الدولارات
+شهرياً عند الحجم نفسه. التفصيل في
+[`docs/PRODUCT_AUDIT.md`](docs/PRODUCT_AUDIT.md) § ٢٥.

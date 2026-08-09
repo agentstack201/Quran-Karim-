@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { API_ROUTES } from '@/constants';
-import type { AsyncStatus, Result, Tafsir } from '@/types';
+import { fetchTafsir } from '@/services/tafsir';
+import type { AsyncStatus, Tafsir } from '@/types';
 
 export type TafsirState = {
   readonly status: AsyncStatus;
@@ -19,9 +19,9 @@ const LOADING: TafsirState = { status: 'loading', tafsir: null, error: null };
 /**
  * Loads the tafsir for one ayah.
  *
- * Fetches through our own `/api/tafsir` route rather than the upstream API, so
- * the response is sanitised, cached and same-origin. Passing a `null` verse key
- * (the dialog is closed) keeps the hook idle and issues no request.
+ * Fetches directly from the upstream content API and sanitises the response in
+ * the browser, so the application needs no server of its own. Passing a `null`
+ * verse key (the dialog is closed) keeps the hook idle and issues no request.
  *
  * The returned state is *derived* from a tagged snapshot rather than reset
  * through effects: a result only counts once it matches the ayah and edition
@@ -38,29 +38,15 @@ export function useTafsir(verseKey: string | null, editionId: number): TafsirSta
     const controller = new AbortController();
 
     const run = async (): Promise<void> => {
-      try {
-        const response = await fetch(API_ROUTES.tafsir(verseKey, editionId), {
-          signal: controller.signal,
-        });
+      const result = await fetchTafsir(verseKey, editionId, controller.signal);
+      // An aborted request belongs to an ayah the reader has already left.
+      if (controller.signal.aborted) return;
 
-        if (!response.ok) throw new Error(`Tafsir request failed: ${response.status}`);
-
-        const payload = (await response.json()) as Result<Tafsir>;
-
-        setSnapshot(
-          payload.ok
-            ? { requestKey, status: 'success', tafsir: payload.data, error: null }
-            : { requestKey, status: 'error', tafsir: null, error: payload.error },
-        );
-      } catch (cause) {
-        if (cause instanceof DOMException && cause.name === 'AbortError') return;
-        setSnapshot({
-          requestKey,
-          status: 'error',
-          tafsir: null,
-          error: 'تعذّر تحميل التفسير. تحقّق من اتصالك بالإنترنت.',
-        });
-      }
+      setSnapshot(
+        result.ok
+          ? { requestKey, status: 'success', tafsir: result.data, error: null }
+          : { requestKey, status: 'error', tafsir: null, error: result.error },
+      );
     };
 
     void run();

@@ -19,14 +19,14 @@ This is a static, client-side reading application. It has no accounts, no
 server-side user data, and no database — so the usual authentication and
 authorisation classes do not apply. What _is_ in scope:
 
-| Area                  | Why it matters                                                                                                                                                    |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Content injection** | Tafsir is fetched from a third-party API. It is converted to plain text server-side and never rendered as markup; a bypass of that would be a genuine XSS vector. |
-| **CSP weaknesses**    | The Content-Security-Policy in `next.config.ts` is intended to be strict. A way around it is worth reporting.                                                     |
-| **Route handlers**    | `/api/search` and `/api/tafsir/[verseKey]` accept user input. Injection, traversal or resource-exhaustion issues there are in scope.                              |
-| **Service worker**    | Cache poisoning, or serving one origin's content under another, would be serious.                                                                                 |
-| **Supply chain**      | The project ships three runtime dependencies precisely to keep this surface small. Issues in them are in scope.                                                   |
-| **Data integrity**    | Any way to make the application display altered Quranic text is treated as a security issue, not merely a bug.                                                    |
+| Area                    | Why it matters                                                                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Content injection**   | Tafsir is fetched from a third-party API directly by the browser. `htmlToPlainText` in `src/services/tafsir.ts` is the only thing between upstream markup and the DOM; a bypass of it would be a genuine XSS vector.  |
+| **CSP weaknesses**      | The Content-Security-Policy lives in `config/security-headers.mjs` and is served from the generated `public/_headers`. A way around it is worth reporting — as is a deployment path where it silently fails to apply. |
+| **Third-party origins** | Only `api.quran.com` and the recitation archives are allow-listed in `connect-src`/`media-src`. A way to reach any other origin from the page is in scope.                                                            |
+| **Service worker**      | Cache poisoning, or serving one origin's content under another, would be serious.                                                                                                                                     |
+| **Supply chain**        | The project ships three runtime dependencies precisely to keep this surface small. Issues in them are in scope.                                                                                                       |
+| **Data integrity**      | Any way to make the application display altered Quranic text is treated as a security issue, not merely a bug.                                                                                                        |
 
 Out of scope: findings that require a compromised device or browser, denial of
 service against a self-hosted deployment, missing headers with no demonstrated

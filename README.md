@@ -64,7 +64,7 @@ Lazy loading · Micro-animations · Reduced-motion aware
 
 | Layer     | Choice                                                    | Why                                                          |
 | --------- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Framework | **Next.js 16** (App Router, RSC)                          | Streaming, route handlers, first-class metadata & SEO        |
+| Framework | **Next.js 16** (App Router, static export)                | 817 prerendered pages, first-class metadata & SEO            |
 | UI        | **React 19**                                              | Server Components + concurrent client interactivity          |
 | Language  | **TypeScript 5.9** (`strict`, `noUncheckedIndexedAccess`) | Zero `any`, exhaustive domain modelling                      |
 | Styling   | **Tailwind CSS 4**                                        | CSS-first design tokens, no runtime cost, no CSS-in-JS       |
@@ -88,7 +88,8 @@ npm install
 npm run dev          # → http://localhost:3000
 
 # 3. Ship
-npm run build && npm start
+npm run build         # → out/ , a folder of static files
+npm start             # preview it exactly as a CDN would serve it
 ```
 
 **Requirements:** Node.js `>= 20.9.0`.
@@ -102,7 +103,7 @@ For deploying to your own domain, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 | ------------------------ | ---------------------------------------- |
 | `npm run dev`            | Development server                       |
 | `npm run build`          | Production build                         |
-| `npm start`              | Serve the production build               |
+| `npm start`              | Serve `out/` the way a static host does  |
 | `npm run lint`           | ESLint (flat config)                     |
 | `npm run typecheck`      | `tsc --noEmit`                           |
 | `npm test`               | Run the test suite once                  |
@@ -120,9 +121,8 @@ For deploying to your own domain, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ```
 src/
-├── app/                    # App Router: routes, layouts, metadata, route handlers
+├── app/                    # App Router: routes, layouts, metadata
 │   ├── (reader)/           #   reading routes sharing the reader chrome
-│   ├── api/                #   BFF route handlers (search, tafsir, audio)
 │   ├── layout.tsx          #   root layout: fonts, theme bootstrap, providers
 │   ├── manifest.ts         #   web app manifest
 │   ├── robots.ts           #   robots.txt
@@ -136,26 +136,44 @@ src/
 ├── utils/                  # Pure helpers (arabic, format, cn, share…)
 ├── types/                  # Domain types — the single source of truth
 ├── constants/              # Reciters, tafsirs, routes, shortcuts, config
-├── data/                   # Generated canonical datasets (chapters, juz, hizb, index)
+├── data/                   # Generated canonical datasets (chapters, juz, hizb, pages)
 └── styles/                 # Design tokens + global stylesheet
 ```
 
+### No server, by design
+
+The application builds to a **fully static site**. There are no route handlers,
+no server components that read a request, and nothing to run once the build
+finishes — `npm run build` produces `out/`, a folder of files.
+
+That is a product constraint before it is a technical one. A static site can be
+hosted for nothing, permanently, on infrastructure indifferent to how many
+people read the Quran on it. Every feature is measured against it: anything
+needing a server needs an answer to who pays the bill, and to what happens to
+readers when nobody is left to pay it.
+
+| Concern                    | Where it runs                                             | Server cost |
+| -------------------------- | --------------------------------------------------------- | ----------- |
+| Reading                    | Prerendered HTML                                          | none        |
+| Full-text search           | The browser, against `/data/search/`                      | **none**    |
+| Tafsir                     | `api.quran.com`, called by the client and sanitised there | none        |
+| Recitation                 | The audio archive, directly                               | none        |
+| Progress, bookmarks, plans | `LocalStorage` on the device                              | none        |
+
 ### Data strategy
 
-Reading data is **bundled, not fetched**. The full Uthmani text, transliteration,
-English translation and structural metadata are generated once by
-`scripts/generate-quran-data.mjs` and committed:
+Reading data is **bundled, not fetched from an API**. The full Uthmani text,
+transliteration, English translation and structural metadata are generated once
+by `scripts/generate-quran-data.mjs` and committed:
 
-- `src/data/chapters.json` · `juz.json` · `hizb.json` — small, imported directly
+- `src/data/chapters.json` · `juz.json` · `hizb.json` · `pages.json` — small, imported directly
 - `public/data/surah/{n}.json` — per-surah payloads, fetched on demand and cached by the SW
-- `src/data/search-index.json` — server-only, powers `/api/search`
+- `public/data/search/ar.json` · `en.json` — the search index, split by script and
+  stored columnar so an Arabic query pulls 550 kB gzipped instead of 930 kB. Fetched
+  on the first search, then permanent — which is why search works offline.
 
-Live services (**tafsir**, **recitation audio**) are layered on top through
-`/api/*` route handlers, so the browser only ever talks to our own origin, upstream
-failures degrade gracefully, and responses become offline-available once visited.
-
-This is a deliberate trade-off: it costs ~6 MB in the repository and buys instant
-first paint, zero rate-limit exposure, and a Mus'haf that genuinely works on a plane.
+This costs ~11 MB in the repository and buys instant first paint, zero
+rate-limit exposure, and a Mus'haf that genuinely works on a plane.
 
 ---
 

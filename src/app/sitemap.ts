@@ -2,6 +2,9 @@ import type { MetadataRoute } from 'next';
 import { ROUTES, SITE_URL } from '@/constants';
 import { CHAPTERS, HIZB_LIST, JUZ_LIST, PAGE_LIST } from '@/services/quran';
 
+/** يُكتب مرة واحدة عند البناء — الموقع تصدير ثابت بلا خادم. */
+export const dynamic = 'force-static';
+
 /**
  * خريطة الموقع.
  *

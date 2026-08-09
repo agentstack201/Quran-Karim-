@@ -38,12 +38,37 @@ export const ISTIADHAH = 'أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّ�
 /** Sadaqa Allah, shown at the end of a surah. */
 export const SADAQA = 'صَدَقَ ٱللَّهُ ٱلۡعَظِيمُ';
 
-/** Attribution shown in the footer and the tafsir dialog. */
+/**
+ * إسناد المصادر، يُعرض في التذييل وصفحة «عن التطبيق» ونافذة التفسير.
+ *
+ * هذا التزام ترخيصي لا زينة: نص المصحف مولَّد من مصدر تحت CC BY-SA 4.0،
+ * والرخصة تشترط تسمية المصدر والرخصة معاً. كان هذا الحقل ينسب النص إلى
+ * «موسوعة القرآن الكريم» بينما يولّده `scripts/generate-quran-data.mjs` فعلياً
+ * من `quran-json` و`quran-meta` — إسنادٌ خاطئ، وهو بذاته إخلال بالشرط.
+ *
+ * القاعدة هنا: **ما يُعرض للقارئ يجب أن يطابق ما يقرؤه المولّد.** أي تغيير في
+ * مصادر السكربت يلزمه تغيير مقابل في هذا الملف.
+ *
+ * `licence` اختياري عن قصد: يُذكر حيث تحقّقنا منه، ويُترك فارغاً حيث لم
+ * نتحقّق بعد بدل ادّعاء ما لا نعلم.
+ *
+ * @see scripts/generate-quran-data.mjs
+ * @see docs/PRODUCT_AUDIT.md § مصفوفة التراخيص
+ */
 export const DATA_ATTRIBUTION = {
   text: {
-    label: 'نص المصحف',
-    source: 'موسوعة القرآن الكريم',
-    href: 'https://quranenc.com',
+    label: 'نص المصحف والترجمة',
+    source: 'quran-json',
+    href: 'https://github.com/risan/quran-json',
+    licence: 'CC BY-SA 4.0',
+    licenceHref: 'https://creativecommons.org/licenses/by-sa/4.0/deed.ar',
+  },
+  structure: {
+    label: 'الأجزاء والأحزاب والصفحات',
+    source: 'quran-meta',
+    href: 'https://github.com/quran-center/quran-meta',
+    licence: 'MIT',
+    licenceHref: 'https://opensource.org/licenses/MIT',
   },
   tafsir: {
     label: 'التفسير',

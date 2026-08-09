@@ -30,13 +30,18 @@ export const ROUTES = {
   offline: '/offline',
 } as const;
 
-/** API endpoints served by our own route handlers. */
-export const API_ROUTES = {
-  search: '/api/search',
-  tafsir: (verseKey: string, tafsirId: number): string =>
-    `/api/tafsir/${encodeURIComponent(verseKey)}?edition=${tafsirId}`,
+/**
+ * Static data assets.
+ *
+ * Not "API routes" — the application has no server. These are immutable files
+ * on the CDN, which is why they can be fetched with `force-cache` and cached
+ * permanently by the service worker.
+ */
+export const DATA_ROUTES = {
   surah: (id: number): string => `/data/surah/${id}.json`,
   juz: (id: number): string => `/data/juz/${id}.json`,
+  searchArabic: '/data/search/ar.json',
+  searchEnglish: '/data/search/en.json',
 } as const;
 
 /** Primary navigation, rendered in the header and the mobile drawer. */

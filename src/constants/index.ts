@@ -30,7 +30,7 @@ export {
 
 export { DEFAULT_TAFSIR_ID, QURAN_API_BASE, TAFSIR_EDITIONS, getTafsirEdition } from './tafsirs';
 
-export { API_ROUTES, NAV_ITEMS, ROUTES } from './routes';
+export { DATA_ROUTES, NAV_ITEMS, ROUTES } from './routes';
 
 export {
   DEFAULT_SETTINGS,

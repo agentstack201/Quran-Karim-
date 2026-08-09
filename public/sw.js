@@ -9,9 +9,9 @@
  *
  *   navigations      network-first, falling back to cache, then /offline
  *   build output     cache-first, immutable (hashed filenames)
- *   surah data       cache-first, immutable (content never changes)
+ *   Quran data       cache-first, immutable (verses and the search index)
  *   fonts            cache-first, immutable
- *   API responses    stale-while-revalidate (tafsir, search)
+ *   tafsir           stale-while-revalidate (upstream, cross-origin)
  *   recitation audio cache-first, but never populated here
  *
  * Audio is served from the cache when it is there and fetched from the network
@@ -28,14 +28,17 @@
  * Bump on every deploy that changes the precache list or a strategy.
  * Old caches are deleted on activate.
  */
-const VERSION = 'v3';
+const VERSION = 'v4';
 
 const CACHES = {
   shell: `tilawa-shell-${VERSION}`,
   assets: `tilawa-assets-${VERSION}`,
   data: `tilawa-data-${VERSION}`,
-  api: `tilawa-api-${VERSION}`,
+  tafsir: `tilawa-tafsir-${VERSION}`,
 };
+
+/** Origin of the tafsir content API — the only cross-origin JSON we cache. */
+const TAFSIR_ORIGIN = 'https://api.quran.com';
 
 /**
  * Downloaded recitations.
@@ -73,8 +76,9 @@ const PRECACHE_URLS = [
   // Bookmarks and settings live entirely in LocalStorage, so this page works
   // perfectly with no network — but only if the shell itself is cached. It was
   // not, and an offline reader reaching for their saved ayat got the offline
-  // page instead. Search is precached for the same reason: full-text search
-  // needs the network, but the page explains that rather than failing blankly.
+  // page instead. Search is precached for the same reason, and now genuinely
+  // works offline: its index is an ordinary `/data/` asset, cached on first use
+  // like any surah.
   '/bookmarks',
   '/search',
   '/about',
@@ -87,9 +91,10 @@ const PRECACHE_URLS = [
 
 /** Entries kept per cache before the oldest are evicted. */
 const CACHE_LIMITS = {
-  // 114 surah payloads plus 30 juz payloads, with headroom.
+  // 114 surah payloads, 30 juz payloads and the two search index halves,
+  // with headroom.
   [CACHES.data]: 160,
-  [CACHES.api]: 220,
+  [CACHES.tafsir]: 220,
 };
 
 // ---------------------------------------------------------------------------
@@ -274,7 +279,16 @@ self.addEventListener('fetch', (event) => {
     // stored here — see the note on AUDIO_CACHE.
     if (AUDIO_URL_PATTERN.test(url.pathname)) {
       event.respondWith(audioFromDownloads(request));
+      return;
     }
+
+    // Tafsir, fetched straight from the content API now that the app has no
+    // server of its own. Caching it here is what keeps an ayah's tafsir
+    // available after the first read, including with no connection.
+    if (url.origin === TAFSIR_ORIGIN) {
+      event.respondWith(staleWhileRevalidate(request, CACHES.tafsir));
+    }
+
     return;
   }
 
@@ -283,7 +297,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Immutable verse payloads — the single most valuable thing to have offline.
+  // Immutable verse payloads and the search index — the single most valuable
+  // thing to have offline.
   if (url.pathname.startsWith('/data/')) {
     event.respondWith(cacheFirst(request, CACHES.data));
     return;
@@ -296,12 +311,6 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/icons/')
   ) {
     event.respondWith(cacheFirst(request, CACHES.assets));
-    return;
-  }
-
-  // Tafsir and search: fresh when possible, instant and offline-capable always.
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(staleWhileRevalidate(request, CACHES.api));
     return;
   }
 

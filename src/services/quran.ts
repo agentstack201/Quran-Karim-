@@ -2,7 +2,7 @@ import chaptersData from '@/data/chapters.json';
 import hizbData from '@/data/hizb.json';
 import juzData from '@/data/juz.json';
 import pagesData from '@/data/pages.json';
-import { API_ROUTES } from '@/constants';
+import { DATA_ROUTES } from '@/constants';
 import type {
   Chapter,
   ChapterWithVerses,
@@ -145,7 +145,7 @@ export async function fetchChapter(
 
   const request = (async (): Promise<Result<ChapterWithVerses>> => {
     try {
-      const response = await fetch(API_ROUTES.surah(id), {
+      const response = await fetch(DATA_ROUTES.surah(id), {
         signal: signal ?? null,
         // The payload is immutable, so the HTTP cache is exactly the right
         // place for it — no revalidation round-trip on repeat reads.
@@ -208,7 +208,7 @@ export async function fetchJuzVerses(
 
   const request = (async (): Promise<Result<readonly Verse[]>> => {
     try {
-      const response = await fetch(API_ROUTES.juz(id), {
+      const response = await fetch(DATA_ROUTES.juz(id), {
         signal: signal ?? null,
         cache: 'force-cache',
       });

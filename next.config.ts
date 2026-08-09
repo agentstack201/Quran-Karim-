@@ -1,48 +1,35 @@
 import type { NextConfig } from 'next';
+// @ts-expect-error — plain ESM module, shared with scripts/generate-headers.mjs
+// so the policy served in production and the one applied in `next dev` are
+// literally the same object. It has no types of its own by design: adding a
+// build step to a config file's dependency would be worse than this comment.
+import { pathHeaders, securityHeaders } from './config/security-headers.mjs';
 
 /**
- * Security headers applied to every response.
+ * The application builds to a fully static site.
  *
- * The Content-Security-Policy is intentionally strict. `'unsafe-inline'` is
- * required for styles because Next.js injects critical CSS inline, and the
- * theme bootstrap script is allow-listed through a hash-free `'strict-dynamic'`
- * free policy that only trusts same-origin scripts plus the inline bootstrap.
+ * There are no route handlers, no server components that read a request, and no
+ * revalidation — search runs against an index in the browser, tafsir is fetched
+ * from its upstream API by the client, and every verse payload is an immutable
+ * file. What is left is 700-odd prerendered pages and a folder of JSON.
+ *
+ * That is a deliberate product constraint rather than a technical accident: a
+ * static site can be hosted for nothing, forever, on infrastructure that does
+ * not care how many people read the Quran on it. Every feature added from here
+ * is measured against it — anything that needs a server to run needs a
+ * justification for the running cost, and for what happens to readers when
+ * nobody is left to pay it.
+ *
+ * Security headers cannot be served by `headers()` in this mode, because
+ * nothing is running to serve them. They are written to `public/_headers` for
+ * the CDN instead; the block below only affects `next dev`.
+ *
+ * @see config/security-headers.mjs
+ * @see scripts/generate-headers.mjs
  */
-const AUDIO_ORIGINS =
-  'https://everyayah.com https://*.everyayah.com https://download.quranicaudio.com';
-const API_ORIGINS = 'https://api.quran.com';
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "object-src 'none'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "img-src 'self' data: blob:",
-  "font-src 'self' data:",
-  "style-src 'self' 'unsafe-inline'",
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
-  `connect-src 'self' ${API_ORIGINS} ${AUDIO_ORIGINS}`,
-  `media-src 'self' blob: ${AUDIO_ORIGINS}`,
-  "worker-src 'self' blob:",
-  "manifest-src 'self'",
-  'upgrade-insecure-requests',
-].join('; ');
-
-const securityHeaders = [
-  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'X-DNS-Prefetch-Control', value: 'on' },
-  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-  {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-  },
-];
-
 const nextConfig: NextConfig = {
+  output: 'export',
+
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -59,29 +46,21 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 
+  /**
+   * Development only — a static export has no server to run this.
+   *
+   * Kept so that what a developer browses locally behaves like production
+   * rather than being quietly more permissive, which is how a CSP violation
+   * reaches a deploy unnoticed.
+   */
   async headers() {
     return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-      {
-        // The service worker must never be served from a stale HTTP cache,
-        // otherwise clients can get stuck on an outdated shell.
-        source: '/sw.js',
-        headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
-          { key: 'Service-Worker-Allowed', value: '/' },
-        ],
-      },
-      {
-        source: '/data/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-      {
-        source: '/fonts/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
+      { source: '/:path*', headers: securityHeaders },
+      ...pathHeaders.map(({ source, headers }: { source: string; headers: unknown[] }) => ({
+        // `_headers` globs with `*`; Next matches with `:path*`.
+        source: source.replace(/\/\*$/, '/:path*'),
+        headers,
+      })),
     ];
   },
 };

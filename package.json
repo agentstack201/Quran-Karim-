@@ -20,8 +20,9 @@
   },
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-headers.mjs",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/serve-static.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
@@ -33,6 +34,7 @@
     "format:check": "prettier --check .",
     "data:generate": "node scripts/generate-quran-data.mjs",
     "data:pages": "node scripts/generate-pages.mjs",
+    "headers:generate": "node scripts/generate-headers.mjs",
     "fonts:fetch": "node scripts/fetch-fonts.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"

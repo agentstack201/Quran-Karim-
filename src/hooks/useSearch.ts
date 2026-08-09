@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { API_ROUTES, SEARCH_DEBOUNCE_MS, SEARCH_MIN_LENGTH } from '@/constants';
+import { SEARCH_DEBOUNCE_MS, SEARCH_MIN_LENGTH } from '@/constants';
 import { CHAPTERS, searchChapters } from '@/services/quran';
-import type { AsyncStatus, Chapter, SearchResponse, SearchResult } from '@/types';
+import { isSearchIndexResident, searchVerses } from '@/services/search';
+import type { AsyncStatus, Chapter, SearchResult } from '@/types';
 import { normaliseArabic, parseVerseReference } from '@/utils';
 import { useDebouncedValue } from './useDebouncedValue';
 import { useOnlineStatus } from './useOnlineStatus';
@@ -12,7 +13,7 @@ export type SearchState = {
   readonly query: string;
   readonly setQuery: (query: string) => void;
   readonly status: AsyncStatus;
-  /** Full-text hits from the server. Empty while offline. */
+  /** Full-text hits, resolved in the browser against the local index. */
   readonly verses: readonly SearchResult[];
   /** Surah-name matches, resolved locally and always available. */
   readonly chapters: readonly Chapter[];
@@ -21,7 +22,11 @@ export type SearchState = {
   readonly total: number;
   readonly truncated: boolean;
   readonly error: string | null;
-  /** True when full-text search is unavailable because the device is offline. */
+  /**
+   * True only when full-text search genuinely cannot run: the device is offline
+   * *and* the index was never downloaded. Once it is cached, being offline
+   * changes nothing, so claiming degradation then would be a lie.
+   */
   readonly degraded: boolean;
   readonly clear: () => void;
 };
@@ -40,12 +45,14 @@ const NO_VERSES: readonly SearchResult[] = [];
 /**
  * Search-as-you-type across three lookups that answer different questions.
  *
- * Surah-name matching and `surah:ayah` reference parsing run locally and
- * resolve instantly — they work offline and cost nothing. Full-text search hits
- * `/api/search`, because the index that powers it belongs on the server.
+ * All three run in the browser. Surah-name matching and `surah:ayah` reference
+ * parsing resolve from bundled metadata; full-text search resolves against an
+ * index fetched once and cached immutably, so after a reader's first search the
+ * whole feature is local, instant and available offline.
  *
- * When the device is offline the local lookups still answer, and `degraded`
- * lets the UI say so plainly instead of showing an empty result list.
+ * `degraded` covers the one case that remains: a first search attempted with no
+ * connection and no cached index. The UI says so plainly instead of showing an
+ * empty result list.
  *
  * Verse results are derived from a query-tagged snapshot rather than reset
  * through effects, so a stale response can never be attributed to a newer
@@ -75,44 +82,34 @@ export function useSearch(initialQuery = ''): SearchState {
     [trimmed],
   );
 
+  const unreachable = !online && !isSearchIndexResident();
+
   useEffect(() => {
-    if (!shouldSearch || !online) return;
+    if (!shouldSearch || unreachable) return;
 
     const controller = new AbortController();
 
     const run = async (): Promise<void> => {
-      try {
-        const response = await fetch(`${API_ROUTES.search}?q=${encodeURIComponent(trimmed)}`, {
-          signal: controller.signal,
-        });
+      const result = await searchVerses(trimmed, undefined, controller.signal);
+      if (controller.signal.aborted) return;
 
-        if (!response.ok) throw new Error(`Search failed: ${response.status}`);
-
-        const payload = (await response.json()) as SearchResponse;
-
-        setSnapshot({
-          query: trimmed,
-          verses: payload.results,
-          total: payload.total,
-          truncated: payload.truncated,
-          error: null,
-        });
-      } catch (cause) {
-        if (cause instanceof DOMException && cause.name === 'AbortError') return;
-        setSnapshot({
-          query: trimmed,
-          verses: NO_VERSES,
-          total: 0,
-          truncated: false,
-          error: 'تعذّر تنفيذ البحث. حاول مرة أخرى.',
-        });
-      }
+      setSnapshot(
+        result.ok
+          ? {
+              query: trimmed,
+              verses: result.data.results,
+              total: result.data.total,
+              truncated: result.data.truncated,
+              error: null,
+            }
+          : { query: trimmed, verses: NO_VERSES, total: 0, truncated: false, error: result.error },
+      );
     };
 
     void run();
 
     return () => controller.abort();
-  }, [trimmed, shouldSearch, online]);
+  }, [trimmed, shouldSearch, unreachable]);
 
   const clear = useCallback(() => {
     setQuery('');
@@ -123,7 +120,7 @@ export function useSearch(initialQuery = ''): SearchState {
 
   let status: AsyncStatus;
   if (!shouldSearch) status = 'idle';
-  else if (!online) status = 'success';
+  else if (unreachable) status = 'success';
   else if (!resolved) status = 'loading';
   else status = resolved.error ? 'error' : 'success';
 
@@ -137,7 +134,7 @@ export function useSearch(initialQuery = ''): SearchState {
     total: resolved?.total ?? 0,
     truncated: resolved?.truncated ?? false,
     error: resolved?.error ?? null,
-    degraded: !online && shouldSearch,
+    degraded: unreachable && shouldSearch,
     clear,
   };
 }

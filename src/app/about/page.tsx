@@ -140,7 +140,14 @@ export default function AboutPage(): React.JSX.Element {
                 key={key}
                 className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3.5"
               >
-                <span className="text-sm font-medium text-ink">{entry.label}</span>
+                <span className="text-sm font-medium text-ink">
+                  {entry.label}
+                  {'licence' in entry && (
+                    <span className="block text-xs font-normal text-ink-subtle">
+                      {entry.licence}
+                    </span>
+                  )}
+                </span>
                 <a
                   href={entry.href}
                   target="_blank"
@@ -156,7 +163,9 @@ export default function AboutPage(): React.JSX.Element {
 
           <p className="mt-5 text-xs leading-relaxed text-ink-subtle">
             نص المصحف والترجمات منشورة برخصة Creative Commons BY-SA 4.0. الشيفرة المصدرية للتطبيق
-            منشورة برخصة MIT. خطّا أميري وكايرو منشوران برخصة SIL Open Font License 1.1.
+            منشورة برخصة MIT. خطّا أميري وكايرو منشوران برخصة SIL Open Font License 1.1. أما التفسير
+            والتلاوات فتُجلب من مصادرها عند الطلب ولا يعيد هذا التطبيق نشرها، وحقوق كل تلاوة
+            لصاحبها.
           </p>
         </section>
       </div>

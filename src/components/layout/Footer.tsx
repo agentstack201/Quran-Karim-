@@ -62,14 +62,36 @@ export function Footer(): React.JSX.Element {
               {Object.entries(DATA_ATTRIBUTION).map(([key, entry]) => (
                 <li key={key} className="text-sm">
                   <span className="text-ink-subtle">{entry.label}: </span>
+                  {/*
+                   * Underlined, not merely tinted. These sit inside a line of
+                   * ordinary text, and the tint alone measured 1.87:1 against
+                   * the surrounding prose in dark mode — well under the 3:1
+                   * WCAG asks for when colour is the only cue. An underline
+                   * carries the same information without depending on it.
+                   */}
                   <a
                     href={entry.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xs text-ink-muted transition-colors duration-200 hover:text-primary"
+                    className="rounded-xs text-ink-muted underline decoration-border underline-offset-2 transition-colors duration-200 hover:text-primary hover:decoration-primary"
                   >
                     {entry.source}
                   </a>
+                  {/* الرخصة جزء من الإسناد الواجب، لا تفصيل قانوني ثانوي:
+                      CC BY-SA تشترط ذكرها مع اسم المصدر. */}
+                  {'licence' in entry && (
+                    <>
+                      {' — '}
+                      <a
+                        href={entry.licenceHref}
+                        target="_blank"
+                        rel="noopener noreferrer license"
+                        className="rounded-xs text-ink-subtle underline decoration-border underline-offset-2 transition-colors duration-200 hover:text-primary hover:decoration-primary"
+                      >
+                        {entry.licence}
+                      </a>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

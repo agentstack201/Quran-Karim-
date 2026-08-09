@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The application no longer has a server.** It builds to a static export —
+  817 prerendered pages and a folder of JSON — so it can be hosted for nothing,
+  permanently, on infrastructure indifferent to how many people read on it.
+  This is a product constraint as much as a technical one: any feature added
+  from here must answer who pays for its running cost, and what happens to
+  readers when nobody is left to pay it.
+- **Search moved into the browser** and `/api/search` was deleted. The index is
+  now split by script and stored columnar — position encodes the ayah id, so
+  6236 records shed three numbers and four repeated keys each. An Arabic query
+  downloads 550 kB gzipped once, then never again. **Search now works offline**,
+  which for a Quran reader is not a nicety: the reader looking for an ayah on a
+  plane is the same one who needed it at home.
+- **Tafsir is fetched directly from the content API** and `/api/tafsir` was
+  deleted. The upstream HTML is still stripped to plain text before it can reach
+  the DOM — that sanitiser matters more now, not less, and the service worker
+  caches the result so an ayah's tafsir survives going offline.
+- Security headers moved to `config/security-headers.mjs`, the single source for
+  both `next dev` and the generated `public/_headers` the CDN reads. A static
+  export has nothing running to serve `headers()`, and a policy that looks
+  enforced while being absent in production is worse than no policy.
+- `npm start` now serves `out/` the way a static host does — extension-less HTML
+  resolution and the real header rules — so a local audit measures the deployed
+  site rather than a more permissive imitation.
+
+### Fixed
+
+- **The displayed data attribution was wrong.** The footer credited
+  quranenc.com while `scripts/generate-quran-data.mjs` actually generates the
+  text from `quran-json` (CC BY-SA 4.0) and `quran-meta` (MIT). CC BY-SA
+  requires naming the source and the licence, so an incorrect credit was a live
+  breach of its terms rather than a cosmetic slip. Both sources and both
+  licences are now named.
+- `Permissions-Policy` sent `microphone=()`, which would have refused
+  `getUserMedia` at the header level before any consent prompt could appear. It
+  is now `microphone=(self)`; camera and geolocation stay denied outright.
+- The source links in the footer relied on colour alone to distinguish
+  themselves from surrounding text — 1.87:1 in dark mode against the 3:1 WCAG
+  requires. They are underlined now. Caught by the axe-core suite, which is the
+  entire reason it runs on every appearance and dialog.
+
+### Removed
+
+- `html-version/`, a standalone static copy of the surah index. A second source
+  of truth that would drift from the app and quietly rot.
+
 ### Performance
 
 - **Fonts cut from 312 kB to 138 kB.** Declaring all nine vendored files as two

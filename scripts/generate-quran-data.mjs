@@ -6,9 +6,10 @@
  *   src/data/chapters.json        114 surah records (metadata only)
  *   src/data/juz.json              30 juz boundaries
  *   src/data/hizb.json             60 hizb boundaries
- *   src/data/search-index.json     6236 verse records powering server-side search
  *   public/data/surah/{1..114}.json  full verse payloads, fetched on demand
  *   public/data/juz/{1..30}.json     juz payloads, so a juz or hizb is one request
+ *   public/data/search/ar.json       normalised + Uthmani columns, for search
+ *   public/data/search/en.json       translation column, for Latin queries
  *
  * Sources
  *   • Uthmani text, transliteration and translations — `quran-json` (CC BY-SA 4.0)
@@ -37,6 +38,7 @@ const SRC_DATA_DIR = join(ROOT, 'src', 'data');
 const PUBLIC_DATA_DIR = join(ROOT, 'public', 'data');
 const SURAH_DIR = join(PUBLIC_DATA_DIR, 'surah');
 const JUZ_DIR = join(PUBLIC_DATA_DIR, 'juz');
+const SEARCH_DIR = join(PUBLIC_DATA_DIR, 'search');
 
 const TOTAL_SURAHS = 114;
 const TOTAL_VERSES = 6236;
@@ -109,6 +111,48 @@ async function writeJson(path, data, { pretty = false } = {}) {
   await writeFile(path, `${body}\n`, 'utf8');
 }
 
+/** Schema version of the search payloads; the client refuses anything else. */
+const SEARCH_INDEX_VERSION = 1;
+
+/**
+ * Writes the search index as two columnar payloads under `public/`.
+ *
+ * Split, because the two halves answer different questions and almost nobody
+ * asks both: an Arabic query never reads the English column, and a Latin query
+ * never reads the Arabic one. Loading them separately means a reader searching
+ * in Arabic — which is nearly all of them — downloads 550 kB instead of 930 kB.
+ *
+ * Columnar, because the record form repeated the four keys `n`/`o`/`t` and the
+ * three derivable numbers 6236 times each. Position carries the identity
+ * instead: entry `k` is ayah id `k + 1`, and the surah and ayah it belongs to
+ * come from the chapter table that is already bundled in the client.
+ *
+ * Under `public/` rather than `src/` because this is now a client asset. It is
+ * fetched on the first search, cached immutably, and every search after that —
+ * including offline — runs against it in the browser. That is what removed the
+ * last server dependency from the reading path.
+ */
+async function writeSearchIndex(entries) {
+  if (entries.length !== TOTAL_VERSES) {
+    throw new Error(`Search index has ${entries.length} entries, expected ${TOTAL_VERSES}`);
+  }
+
+  await mkdir(SEARCH_DIR, { recursive: true });
+
+  await writeJson(join(SEARCH_DIR, 'ar.json'), {
+    version: SEARCH_INDEX_VERSION,
+    count: entries.length,
+    n: entries.map((entry) => entry.n),
+    o: entries.map((entry) => entry.o),
+  });
+
+  await writeJson(join(SEARCH_DIR, 'en.json'), {
+    version: SEARCH_INDEX_VERSION,
+    count: entries.length,
+    t: entries.map((entry) => entry.t),
+  });
+}
+
 async function main() {
   const started = Date.now();
   console.log(`▸ Tilawa dataset generator (quran-json@${QURAN_JSON_VERSION})`);
@@ -176,10 +220,12 @@ async function main() {
 
       verseTally += 1;
 
+      // Positional, not keyed: the array index *is* `ayahId - 1`, so the id,
+      // surah and ayah of every entry are derivable from position against the
+      // chapter table the app already bundles. Dropping those three numbers
+      // from 6236 records is most of what makes the index small enough to hand
+      // to the browser.
       searchIndex.push({
-        i: ayahId,
-        s: surahNumber,
-        a: ayahNumber,
         // Normalised for matching…
         n: normaliseArabic(arabicText),
         // …and the Uthmani original, so results render with full vocalisation
@@ -328,7 +374,7 @@ async function main() {
   await writeJson(join(SRC_DATA_DIR, 'chapters.json'), chapters, { pretty: true });
   await writeJson(join(SRC_DATA_DIR, 'juz.json'), juzList, { pretty: true });
   await writeJson(join(SRC_DATA_DIR, 'hizb.json'), hizbList, { pretty: true });
-  await writeJson(join(SRC_DATA_DIR, 'search-index.json'), searchIndex);
+  await writeSearchIndex(searchIndex);
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
   console.log(
